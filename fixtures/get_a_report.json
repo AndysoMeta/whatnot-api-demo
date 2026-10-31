@@ -1,0 +1,29 @@
+{
+  "function": "get_a_report",
+  "tag": "Analytics",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:36:55.000Z",
+  "args": {
+    "report_id": "01a1911a-8d28-773c-a427-ae298ad31906"
+  },
+  "status": 200,
+  "body": {
+    "id": "01a1911a-8d28-773c-a427-ae298ad31906",
+    "report_type": "analytics_livestreams_report",
+    "status": "completed",
+    "report_parameters": {
+      "report_type": "analytics_livestreams_report",
+      "all_matching": null,
+      "specific_shows": {
+        "show_ids": [
+          "086df56b-c77d-436d-bff5-5ac154016aac"
+        ]
+      }
+    },
+    "report_url": "redacted (signed 7-day download link to the CSV; re-run get_a_report live for a fresh one)",
+    "created_at": "2026-10-31T08:36:38.824Z",
+    "updated_at": "2026-10-31T08:36:39.357Z"
+  },
+  "note": "Checked the report run a few seconds later. It had already completed and now carries a report_url, a signed CSV download link valid for 7 days; the recorder did not fetch it. The report_url in the live response was a signed download link and has been redacted here."
+}

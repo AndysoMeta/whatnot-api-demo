@@ -1,0 +1,72 @@
+{
+  "function": "list_dimension_profiles",
+  "tag": "Shipping",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:32:11.000Z",
+  "args": {
+    "limit": 5
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "3040537",
+        "name": "Large Flat Rate Box",
+        "weight": {
+          "value": 1,
+          "unit": "pound"
+        },
+        "dimensions": null,
+        "ownership": "seller",
+        "active": true
+      },
+      {
+        "id": "3002053",
+        "name": "PWE Single Ship Padding",
+        "weight": {
+          "value": 2,
+          "unit": "ounce"
+        },
+        "dimensions": null,
+        "ownership": "seller",
+        "active": true
+      },
+      {
+        "id": "2532509",
+        "name": "Max 1",
+        "weight": {
+          "value": 12,
+          "unit": "ounce"
+        },
+        "dimensions": null,
+        "ownership": "seller",
+        "active": true
+      },
+      {
+        "id": "2230317",
+        "name": "Amazon Mystery Box",
+        "weight": {
+          "value": 10,
+          "unit": "pound"
+        },
+        "dimensions": null,
+        "ownership": "seller",
+        "active": true
+      },
+      {
+        "id": "2230312",
+        "name": "1 Item 1 Box",
+        "weight": {
+          "value": 5,
+          "unit": "pound"
+        },
+        "dimensions": null,
+        "ownership": "seller",
+        "active": true
+      }
+    ],
+    "next_cursor": "gAAAAABq5aeLPSJqq-ryzsPn-0xeAKlNDz-8aMl9k9OFd4FzWrCbdP4aC6W4RmzAFyTm_fjBFSjnJULCI2WGqUdMuIQEFvukk0rMHg8aaIEFd7HWE7G0MkIg36dbQP1wje7yG-kHwfHiuf4Uj40G3mz53f60eLn4DUk-42q2vqVuRqW9giwNHjZeGmM4hu56hQOAB7i1SPF-pnJG-As84IeUa-VfmBZkIg=="
+  },
+  "note": "Listed the first five shipping dimension profiles the seller can use, newest first. All five are seller-owned weight-only profiles, and next_cursor points to more."
+}

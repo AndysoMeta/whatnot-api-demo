@@ -1,0 +1,119 @@
+{
+  "function": "list_orders",
+  "tag": "Orders",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:32:30.000Z",
+  "args": {
+    "limit": 3
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "1485136575",
+        "url": "https://www.whatnot.com/dashboard/orders/H9HZSPswJmp98JUXAyKxEg",
+        "status": "failed",
+        "show_id": "b2bf815b-ea29-4247-a64b-15ddc7bfebc1",
+        "transaction_type": "buy_it_now",
+        "buyer": {
+          "id": "75158168",
+          "username": "redacted",
+          "display_name": "redacted"
+        },
+        "amounts": {
+          "subtotal": {
+            "amount": "4",
+            "currency": "USD"
+          },
+          "shipping": {
+            "amount": "0",
+            "currency": "USD"
+          },
+          "tax": {
+            "amount": "0.25",
+            "currency": "USD"
+          },
+          "applied_discount": null,
+          "total": {
+            "amount": "0",
+            "currency": "USD"
+          }
+        },
+        "created_at": "2026-10-28T05:09:54.623Z",
+        "updated_at": "2026-10-28T05:09:55.338Z",
+        "cancelled_at": null
+      },
+      {
+        "id": "1485133694",
+        "url": "https://www.whatnot.com/dashboard/orders/Ye6mcWMBZ9Nepw9EKMmahB",
+        "status": "failed",
+        "show_id": "b2bf815b-ea29-4247-a64b-15ddc7bfebc1",
+        "transaction_type": "buy_it_now",
+        "buyer": {
+          "id": "75158168",
+          "username": "redacted",
+          "display_name": "redacted"
+        },
+        "amounts": {
+          "subtotal": {
+            "amount": "4",
+            "currency": "USD"
+          },
+          "shipping": {
+            "amount": "0",
+            "currency": "USD"
+          },
+          "tax": {
+            "amount": "0.25",
+            "currency": "USD"
+          },
+          "applied_discount": null,
+          "total": {
+            "amount": "4.25",
+            "currency": "USD"
+          }
+        },
+        "created_at": "2026-10-28T05:07:51.083Z",
+        "updated_at": "2026-10-28T05:07:51.640Z",
+        "cancelled_at": null
+      },
+      {
+        "id": "1485133101",
+        "url": "https://www.whatnot.com/dashboard/orders/mvAXkF8Zv6RmzsiRA4w4QK",
+        "status": "failed",
+        "show_id": "b2bf815b-ea29-4247-a64b-15ddc7bfebc1",
+        "transaction_type": "buy_it_now",
+        "buyer": {
+          "id": "75158168",
+          "username": "redacted",
+          "display_name": "redacted"
+        },
+        "amounts": {
+          "subtotal": {
+            "amount": "4",
+            "currency": "USD"
+          },
+          "shipping": {
+            "amount": "0",
+            "currency": "USD"
+          },
+          "tax": {
+            "amount": "0.25",
+            "currency": "USD"
+          },
+          "applied_discount": null,
+          "total": {
+            "amount": "0",
+            "currency": "USD"
+          }
+        },
+        "created_at": "2026-10-28T05:07:25.027Z",
+        "updated_at": "2026-10-28T05:07:25.764Z",
+        "cancelled_at": null
+      }
+    ],
+    "next_cursor": "gAAAAABq5aeeGHLTAWWdnG5eGvINf5h5_njo3wgXaB77BQL9DYYhBxrAHG7HQ4ngoDwLgOZ2tYj-Cs-CCimkXI6QcUZFH_0wmnw0_CSwjVodObF5uv7YZEUXQSqy4LoqZ1o8uFJ6SnSsQpe05YBJRfB_B1aUnPP78fvR1qHNsjgJiqW0gEV0WcpeXLhlTsk5bORvglrObDxqh1jsXJWXKRab4FZGcwECy5Uxz6ymmnhXDfAvsshlfOiudhyAdeoMXUWBkMzqjyOI"
+  },
+  "note": "Listed the three newest orders. All three are failed buy it now orders from one buyer in the same show; buyer names are redacted here."
+}

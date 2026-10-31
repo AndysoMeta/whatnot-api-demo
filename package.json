@@ -1,0 +1,15 @@
+{
+  "name": "whatnot-api-demo",
+  "version": "0.1.0",
+  "description": "Local explorer that shows every Whatnot Seller API function with its recorded live response.",
+  "private": true,
+  "type": "module",
+  "author": "Mood Swings Design",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  }
+}

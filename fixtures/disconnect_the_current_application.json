@@ -1,0 +1,11 @@
+{
+  "function": "disconnect_the_current_application",
+  "tag": "Users",
+  "safety": "destructive",
+  "mode": "not_run",
+  "recorded_at": "2026-10-31T08:38:00.000Z",
+  "args": {},
+  "status": null,
+  "body": null,
+  "note": "Not run on purpose. This call revokes the app's access to the seller account, so running it would disconnect Andy's Whatnot connector until he signs in again."
+}

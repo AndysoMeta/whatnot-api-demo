@@ -1,0 +1,21 @@
+{
+  "function": "cancel_an_order",
+  "tag": "Orders",
+  "safety": "destructive",
+  "mode": "error_demo",
+  "recorded_at": "2026-10-31T08:37:08.000Z",
+  "args": {
+    "order_id": "1",
+    "body": {
+      "reason": "other"
+    }
+  },
+  "status": 404,
+  "body": {
+    "type": "order-not-found",
+    "title": "Order not found",
+    "status": 404,
+    "detail": "Order 1 was not found."
+  },
+  "note": "Tried to cancel order 1, an id that cannot belong to this seller, so nothing real was touched. Whatnot answered 404 order-not-found as an application/problem+json error."
+}

@@ -1,0 +1,16 @@
+{
+  "function": "list_reports",
+  "tag": "Analytics",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:33:56.000Z",
+  "args": {
+    "limit": 5
+  },
+  "status": 200,
+  "body": {
+    "data": [],
+    "next_cursor": null
+  },
+  "note": "Listed past report runs. The list was empty because no report had been generated through the API on this account before this run."
+}

@@ -1,0 +1,46 @@
+{
+  "function": "get_an_order",
+  "tag": "Orders",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:32:46.000Z",
+  "args": {
+    "order_id": "1485136575"
+  },
+  "status": 200,
+  "body": {
+    "id": "1485136575",
+    "url": "https://www.whatnot.com/dashboard/orders/H9HZSPswJmp98JUXAyKxEg",
+    "status": "failed",
+    "show_id": "b2bf815b-ea29-4247-a64b-15ddc7bfebc1",
+    "transaction_type": "buy_it_now",
+    "buyer": {
+      "id": "75158168",
+      "username": "redacted",
+      "display_name": "redacted"
+    },
+    "amounts": {
+      "subtotal": {
+        "amount": "4",
+        "currency": "USD"
+      },
+      "shipping": {
+        "amount": "0",
+        "currency": "USD"
+      },
+      "tax": {
+        "amount": "0.25",
+        "currency": "USD"
+      },
+      "applied_discount": null,
+      "total": {
+        "amount": "0",
+        "currency": "USD"
+      }
+    },
+    "created_at": "2026-10-28T05:09:54.623Z",
+    "updated_at": "2026-10-28T05:09:55.338Z",
+    "cancelled_at": null
+  },
+  "note": "Fetched the newest order by id. It is a failed buy it now order with its amounts broken into subtotal, shipping, tax, discount and total; buyer names are redacted here."
+}

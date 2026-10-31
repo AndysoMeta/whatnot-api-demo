@@ -1,0 +1,38 @@
+{
+  "function": "generate_a_report",
+  "tag": "Analytics",
+  "safety": "write",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:36:38.000Z",
+  "args": {
+    "body": {
+      "report_parameters": {
+        "report_type": "analytics_livestreams_report",
+        "specific_shows": {
+          "show_ids": [
+            "086df56b-c77d-436d-bff5-5ac154016aac"
+          ]
+        }
+      }
+    }
+  },
+  "status": 201,
+  "body": {
+    "id": "01a1911a-8d28-773c-a427-ae298ad31906",
+    "report_type": "analytics_livestreams_report",
+    "status": "pending",
+    "report_parameters": {
+      "report_type": "analytics_livestreams_report",
+      "all_matching": null,
+      "specific_shows": {
+        "show_ids": [
+          "086df56b-c77d-436d-bff5-5ac154016aac"
+        ]
+      }
+    },
+    "report_url": null,
+    "created_at": "2026-10-31T08:36:38.824Z",
+    "updated_at": "2026-10-31T08:36:38.824Z"
+  },
+  "note": "Asked Whatnot to build a livestreams analytics report for the test show. It answered 201 with a pending report run and no report_url yet; reports are built in the background."
+}

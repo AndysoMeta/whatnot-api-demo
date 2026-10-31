@@ -1,0 +1,34 @@
+{
+  "function": "get_a_shipment_item",
+  "tag": "Shipments",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:33:48.000Z",
+  "args": {
+    "shipment_id": "519027322",
+    "item_id": "1284784057"
+  },
+  "status": 200,
+  "body": {
+    "id": "1284784057",
+    "shipment_id": "519027322",
+    "order_id": "1475955351",
+    "order_item_id": "1475951120",
+    "dimension_profile": {
+      "id": "905463",
+      "name": "12 oz",
+      "weight": {
+        "value": 12,
+        "unit": "ounce"
+      },
+      "dimensions": null,
+      "ownership": "seller",
+      "active": true
+    },
+    "hazardous_material": "not_hazardous",
+    "country_of_origin": null,
+    "created_at": "2026-10-26T02:18:22.346Z",
+    "updated_at": "2026-10-26T02:18:22.346Z"
+  },
+  "note": "Fetched that single shipment item by shipment id and item id. It matches the list entry: order and order item ids, the 12 oz dimension profile and hazmat status."
+}

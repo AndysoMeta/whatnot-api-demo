@@ -1,0 +1,53 @@
+{
+  "function": "get_a_shipment",
+  "tag": "Shipments",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:33:29.000Z",
+  "args": {
+    "shipment_id": "519027322"
+  },
+  "status": 200,
+  "body": {
+    "id": "519027322",
+    "url": "https://www.whatnot.com/dashboard/shipments/U2hpcG1lbnROb2RlOjUxOTAyNzMyMg==",
+    "status": "in_transit",
+    "fulfillment_method": "shipping",
+    "recipient": {
+      "id": "70917583",
+      "username": "redacted",
+      "display_name": "redacted"
+    },
+    "destination_address": null,
+    "weight": {
+      "value": 12,
+      "unit": "ounce"
+    },
+    "dimensions": {
+      "length": 12,
+      "width": 12,
+      "height": 12,
+      "unit": "inch"
+    },
+    "signature_required": false,
+    "hazardous_material": "not_hazardous",
+    "tracking": {
+      "carrier": "usps",
+      "service": "usps_first_class_package_international_service",
+      "tracking_code": "LS025817872US",
+      "last_mile_tracking_code": null
+    },
+    "documents": null,
+    "insurance": null,
+    "seller_paid_shipping_cost": {
+      "amount": "0",
+      "currency": "USD"
+    },
+    "required_actions": [],
+    "dropoff_due": null,
+    "replacement_shipment_id": null,
+    "created_at": "2026-10-26T02:18:22.303Z",
+    "updated_at": "2026-10-31T04:14:56.983Z"
+  },
+  "note": "Fetched the newest shipment by id. It is an international USPS package in transit with its tracking code; recipient names are redacted here."
+}

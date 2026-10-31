@@ -1,0 +1,23 @@
+{
+  "function": "get_a_dimension_profile",
+  "tag": "Shipping",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:32:23.000Z",
+  "args": {
+    "dimension_profile_id": "123059"
+  },
+  "status": 200,
+  "body": {
+    "id": "123059",
+    "name": "0-1 oz",
+    "weight": {
+      "value": 1,
+      "unit": "ounce"
+    },
+    "dimensions": null,
+    "ownership": "whatnot",
+    "active": true
+  },
+  "note": "Fetched one dimension profile by id. It is the Whatnot-owned 0-1 oz profile, weight 1 ounce, no box dimensions."
+}

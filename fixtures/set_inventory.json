@@ -1,0 +1,32 @@
+{
+  "function": "set_inventory",
+  "tag": "Inventory",
+  "safety": "write",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:35:16.000Z",
+  "args": {
+    "body": {
+      "items": [
+        {
+          "variant_id": "4b774eda-39fe-4195-95d2-2e6c0e01b060",
+          "quantity": 2,
+          "idempotency_key": "api-demo-set-1"
+        }
+      ]
+    }
+  },
+  "status": 207,
+  "body": {
+    "results": [
+      {
+        "variant_id": "4b774eda-39fe-4195-95d2-2e6c0e01b060",
+        "idempotency_key": "api-demo-set-1",
+        "status": "applied",
+        "previous_quantity": 0,
+        "new_quantity": 2,
+        "warnings": []
+      }
+    ]
+  },
+  "note": "Set the demo variant's stock to exactly 2. Each item gets its own result line; this one was applied, going from 0 to 2, and the call returns 207 Multi-Status."
+}

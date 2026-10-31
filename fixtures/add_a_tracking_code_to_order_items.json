@@ -1,0 +1,25 @@
+{
+  "function": "add_a_tracking_code_to_order_items",
+  "tag": "Orders",
+  "safety": "destructive",
+  "mode": "error_demo",
+  "recorded_at": "2026-10-31T08:37:20.000Z",
+  "args": {
+    "body": {
+      "order_item_ids": [
+        "1"
+      ],
+      "tracking_code": "DEMO000000",
+      "carrier": "usps"
+    }
+  },
+  "status": 422,
+  "body": {
+    "type": "invalid-parameter",
+    "title": "Invalid parameter",
+    "status": 422,
+    "detail": "Order items 1 were not found.",
+    "param": "order_item_ids"
+  },
+  "note": "Tried to attach a fake tracking code to order item 1, which does not exist, so no real order was changed. Whatnot answered 422 invalid-parameter naming order_item_ids as the bad field."
+}

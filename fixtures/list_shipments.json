@@ -1,0 +1,140 @@
+{
+  "function": "list_shipments",
+  "tag": "Shipments",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:33:12.000Z",
+  "args": {
+    "limit": 3
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "519027322",
+        "url": "https://www.whatnot.com/dashboard/shipments/U2hpcG1lbnROb2RlOjUxOTAyNzMyMg==",
+        "status": "in_transit",
+        "fulfillment_method": "shipping",
+        "recipient": {
+          "id": "70917583",
+          "username": "redacted",
+          "display_name": "redacted"
+        },
+        "destination_address": null,
+        "weight": {
+          "value": 12,
+          "unit": "ounce"
+        },
+        "dimensions": {
+          "length": 12,
+          "width": 12,
+          "height": 12,
+          "unit": "inch"
+        },
+        "signature_required": false,
+        "hazardous_material": "not_hazardous",
+        "tracking": {
+          "carrier": "usps",
+          "service": "usps_first_class_package_international_service",
+          "tracking_code": "LS025817872US",
+          "last_mile_tracking_code": null
+        },
+        "documents": null,
+        "insurance": null,
+        "seller_paid_shipping_cost": {
+          "amount": "0",
+          "currency": "USD"
+        },
+        "required_actions": [],
+        "dropoff_due": null,
+        "replacement_shipment_id": null,
+        "created_at": "2026-10-26T02:18:22.303Z",
+        "updated_at": "2026-10-31T04:14:56.983Z"
+      },
+      {
+        "id": "518954885",
+        "url": "https://www.whatnot.com/dashboard/shipments/U2hpcG1lbnROb2RlOjUxODk1NDg4NQ==",
+        "status": "in_transit",
+        "fulfillment_method": "shipping",
+        "recipient": {
+          "id": "69572746",
+          "username": "redacted",
+          "display_name": "redacted"
+        },
+        "destination_address": null,
+        "weight": {
+          "value": 1,
+          "unit": "ounce"
+        },
+        "dimensions": {
+          "length": 12,
+          "width": 12,
+          "height": 12,
+          "unit": "inch"
+        },
+        "signature_required": false,
+        "hazardous_material": "not_hazardous",
+        "tracking": {
+          "carrier": "usps",
+          "service": "usps_ground_advantage",
+          "tracking_code": "9300120762602623763706",
+          "last_mile_tracking_code": null
+        },
+        "documents": null,
+        "insurance": null,
+        "seller_paid_shipping_cost": {
+          "amount": "4.47",
+          "currency": "USD"
+        },
+        "required_actions": [],
+        "dropoff_due": null,
+        "replacement_shipment_id": null,
+        "created_at": "2026-10-26T00:56:07.035Z",
+        "updated_at": "2026-10-31T06:35:33.715Z"
+      },
+      {
+        "id": "518085570",
+        "url": "https://www.whatnot.com/dashboard/shipments/U2hpcG1lbnROb2RlOjUxODA4NTU3MA==",
+        "status": "delivered",
+        "fulfillment_method": "shipping",
+        "recipient": {
+          "id": "4015282",
+          "username": "redacted",
+          "display_name": "redacted"
+        },
+        "destination_address": null,
+        "weight": {
+          "value": 12,
+          "unit": "ounce"
+        },
+        "dimensions": {
+          "length": 12.5,
+          "width": 9.5,
+          "height": 1,
+          "unit": "inch"
+        },
+        "signature_required": false,
+        "hazardous_material": "not_hazardous",
+        "tracking": {
+          "carrier": "usps",
+          "service": "usps_priority",
+          "tracking_code": "9305520762601344885318",
+          "last_mile_tracking_code": null
+        },
+        "documents": null,
+        "insurance": null,
+        "seller_paid_shipping_cost": {
+          "amount": "0",
+          "currency": "USD"
+        },
+        "required_actions": [],
+        "dropoff_due": null,
+        "replacement_shipment_id": null,
+        "created_at": "2026-10-25T00:08:07.563Z",
+        "updated_at": "2026-10-30T19:52:12.267Z"
+      }
+    ],
+    "next_cursor": "gAAAAABq5afICAuRHyD-ejnRArkYpdaqGhaWqdhk0Jc9TITxeA1wJX-hpp0QVwv314TNIPrUjBnyRfLX6JdYNdYCADAcBCL9Sqk_6rPVr4bWBevuEmSS10AYPMITOaloHA8aw6TbA95d_c6iF_8LWN_zcEZCEINZo8hXhhS5myB0iwTSaizeamkaVb19U5YPz-G7Q8OEjmAlfU0y6NUIXrNUY2vkwGrXQU_kYq1oAojCZ7SZC3RQ8NOmXY64edh4-ctKVpXHR70X"
+  },
+  "note": "Listed the three newest shipments with status, package weight and size, carrier tracking and seller-paid postage. Recipient names are redacted here; the API itself already returned destination_address as null."
+}

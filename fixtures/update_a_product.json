@@ -1,0 +1,42 @@
+{
+  "function": "update_a_product",
+  "tag": "Products",
+  "safety": "write",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:34:35.000Z",
+  "args": {
+    "product_id": "652907899",
+    "body": {
+      "description": "Created by the API demo recorder on 2026-10-31. Delete me. Updated by the recorder."
+    }
+  },
+  "status": 200,
+  "body": {
+    "id": "652907899",
+    "title": "API DEMO TEST ITEM (safe to delete)",
+    "description": "Created by the API demo recorder on 2026-10-31. Delete me. Updated by the recorder.",
+    "external_id": "api-demo-2026-10-31",
+    "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjUyMjEzNTc1NA==",
+    "category": {
+      "id": "265",
+      "name": "Deal Hunting"
+    },
+    "attributes": [],
+    "options": [],
+    "media": [],
+    "dimension_profile": {
+      "id": "123059",
+      "name": "0-1 oz",
+      "weight": {
+        "value": 1,
+        "unit": "ounce"
+      },
+      "dimensions": null,
+      "ownership": "whatnot",
+      "active": true
+    },
+    "created_at": "2026-10-31T08:34:15.310Z",
+    "updated_at": "2026-10-31T08:34:34.967Z"
+  },
+  "note": "Changed only the description of the demo product. The response is the whole updated product, with the new description and a fresh updated_at; fields left out of the body were kept."
+}

@@ -1,0 +1,17 @@
+{
+  "function": "get_a_product_s_merchandising",
+  "tag": "Merchandising",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:35:35.000Z",
+  "args": {
+    "product_id": "652907899"
+  },
+  "status": 200,
+  "body": {
+    "transaction_type": "buy_it_now",
+    "reserved_for_live": true,
+    "active_in_shows": false
+  },
+  "note": "Read how the demo product is set up for selling before any change. It was already buy it now and reserved for live by default, and not active in any show yet."
+}

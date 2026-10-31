@@ -1,0 +1,13 @@
+{
+  "function": "delete_a_product",
+  "tag": "Products",
+  "safety": "destructive",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:37:47.000Z",
+  "args": {
+    "product_id": "652907899"
+  },
+  "status": 204,
+  "body": "",
+  "note": "Deleted the demo product created earlier in this run, and nothing else. Whatnot answered 204 No Content with an empty body."
+}
