@@ -25,8 +25,14 @@ async function own(files) {
 test("no em dashes in the files this app owns", async () => {
   const ui = (await readdir(join(ROOT, "ui"))).map((f) => `ui/${f}`);
   const tests = (await readdir(join(ROOT, "test"))).map((f) => `test/${f}`);
-  const docs = ["README.md", "CONTRACT.md", "docs/EXPLORER.md"];
-  for (const [name, text] of await own(["catalog.mjs", "server.mjs", "package.json", ...docs, ...ui, ...tests])) {
+  const docs = ["README.md", "CONTRACT.md", "spec/NOTES.md", ...(await readdir(join(ROOT, "docs"))).map((f) => `docs/${f}`)];
+  let examples = [];
+  try {
+    examples = (await readdir(join(ROOT, "examples"))).map((f) => `examples/${f}`);
+  } catch {
+    // examples/ may not exist yet
+  }
+  for (const [name, text] of await own(["catalog.mjs", "server.mjs", "package.json", ...docs, ...ui, ...tests, ...examples])) {
     assert.ok(!text.includes(EM_DASH), `${name} has an em dash`);
   }
 });

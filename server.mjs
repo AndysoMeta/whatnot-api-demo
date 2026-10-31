@@ -8,7 +8,18 @@ import http from "node:http";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join, resolve, extname, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { BASE_URL, TAGS, FUNCTIONS, BY_NAME, NEVER_RUN, buildTokens, unresolvedTokens } from "./catalog.mjs";
+import { randomUUID } from "node:crypto";
+import {
+  BASE_URL,
+  TAGS,
+  FUNCTIONS,
+  BY_NAME,
+  NEVER_RUN,
+  SCOPES,
+  SCOPES_NOTE,
+  buildTokens,
+  unresolvedTokens,
+} from "./catalog.mjs";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 export const DEFAULT_PORT = 7490;
@@ -101,8 +112,29 @@ async function readBody(res) {
   }
 }
 
+// Only these upstream response headers reach the page. Never Set-Cookie or anything else.
+export const PASS_HEADERS = [
+  "ratelimit-limit",
+  "ratelimit-remaining",
+  "ratelimit-reset",
+  "retry-after",
+  "x-request-id",
+  "content-type",
+];
+
+function pickHeaders(res, requestId) {
+  const out = {};
+  for (const name of PASS_HEADERS) {
+    const v = res.headers?.get?.(name);
+    if (v != null && v !== "") out[name] = String(v);
+  }
+  if (!out["x-request-id"]) out["x-request-id"] = requestId;
+  return out;
+}
+
 // Paces upstream calls to at most one per MIN_GAP_MS, in arrival order.
-export function createProxy({ fetchImpl, sleep, now, minGapMs = MIN_GAP_MS }) {
+// Every upstream request carries its own X-Request-ID, which Whatnot support can trace.
+export function createProxy({ fetchImpl, sleep, now, minGapMs = MIN_GAP_MS, newId = randomUUID }) {
   let chain = Promise.resolve();
   let last = -Infinity;
 
@@ -118,17 +150,27 @@ export function createProxy({ fetchImpl, sleep, now, minGapMs = MIN_GAP_MS }) {
   }
 
   return async function call({ method, url, body, token }) {
-    const init = {
-      method,
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", Accept: "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
+    let requestId;
+    const attempt = () => {
+      requestId = newId();
+      const init = {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-Request-ID": requestId,
+        },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      };
+      return fetchImpl(url.toString(), init);
     };
-    let res = await paced(() => fetchImpl(url.toString(), init));
+    let res = await paced(attempt);
     if (res.status === 429) {
       await sleep(parseRetryAfter(res.headers?.get?.("retry-after")));
-      res = await paced(() => fetchImpl(url.toString(), init));
+      res = await paced(attempt);
     }
-    return { status: res.status, body: await readBody(res) };
+    return { status: res.status, headers: pickHeaders(res, requestId), body: await readBody(res) };
   };
 }
 
@@ -298,7 +340,7 @@ export function createApp({
       }
       const { pathname } = new URL(req.url, "http://local");
       if (req.method === "GET" && pathname === "/api/catalog") {
-        return send(res, 200, { base: BASE_URL, tags: TAGS, functions: FUNCTIONS });
+        return send(res, 200, { base: BASE_URL, tags: TAGS, functions: FUNCTIONS, scopes: SCOPES, scopesNote: SCOPES_NOTE });
       }
       if (req.method === "GET" && pathname === "/api/status") {
         return send(res, 200, {

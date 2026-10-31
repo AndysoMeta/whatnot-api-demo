@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { FUNCTIONS, TAGS, TOKENS, BASE_URL, buildTokens, resolveTokens, unresolvedTokens } from "../catalog.mjs";
+import { FUNCTIONS, TAGS, TOKENS, BASE_URL, SCOPES, SCOPES_NOTE, buildTokens, resolveTokens, unresolvedTokens } from "../catalog.mjs";
 
 // The 34 names and tags exactly as CONTRACT.md lists them.
 const EXPECTED = {
@@ -131,4 +131,89 @@ test("tokens resolve from _run.json and list fixtures", () => {
   assert.deepEqual(out, { a: "S1", b: ["xP1"], c: 3, d: "{{SHIPMENT_ID}}" });
   assert.deepEqual(unresolvedTokens(out), ["SHIPMENT_ID"]);
   assert.deepEqual(buildTokens(null, {}), {});
+});
+
+// ---------- scopes ----------
+
+const SCOPE_NAMES = [
+  "read:inventory",
+  "write:inventory",
+  "read:merchandising",
+  "write:merchandising",
+  "read:orders",
+  "write:orders",
+  "read:shipments",
+  "write:shipments",
+  "read:customers",
+  "read:reports",
+  "write:reports",
+  "read:shows",
+];
+
+test("SCOPES lists the 12 Whatnot scopes, each with a meaning", () => {
+  assert.equal(SCOPES.length, 12);
+  assert.deepEqual(SCOPES.map((s) => s.name).sort(), [...SCOPE_NAMES].sort());
+  for (const s of SCOPES) {
+    assert.equal(typeof s.meaning, "string");
+    assert.ok(s.meaning.length > 5, s.name);
+    if (s.name.startsWith("write:")) assert.equal(s.includes, s.name.replace("write:", "read:"), s.name);
+  }
+  assert.match(SCOPES_NOTE, /[Ww]rite.*includes read/);
+});
+
+test("every function has scopes.required of known names and a boolean inferred", () => {
+  const known = new Set(SCOPES.map((s) => s.name));
+  for (const f of FUNCTIONS) {
+    assert.ok(f.scopes && typeof f.scopes === "object", `${f.name} scopes`);
+    assert.ok(Array.isArray(f.scopes.required), `${f.name} scopes.required`);
+    assert.equal(typeof f.scopes.inferred, "boolean", `${f.name} scopes.inferred`);
+    for (const s of f.scopes.required) assert.ok(known.has(s), `${f.name} uses unknown scope ${s}`);
+    assert.equal(new Set(f.scopes.required).size, f.scopes.required.length, `${f.name} duplicate scope`);
+  }
+});
+
+test("write and destructive functions need a write scope, reads need only read scopes", () => {
+  const anyToken = new Set(["get_the_current_user", "disconnect_the_current_application"]);
+  for (const f of FUNCTIONS) {
+    if (anyToken.has(f.name)) {
+      assert.deepEqual(f.scopes.required, [], `${f.name} works with any token`);
+      assert.equal(f.scopes.inferred, false);
+      continue;
+    }
+    assert.ok(f.scopes.required.length > 0, `${f.name} names a scope`);
+    if (f.safety === "read") {
+      for (const s of f.scopes.required) assert.match(s, /^read:/, `${f.name} read needs ${s}`);
+    } else {
+      assert.ok(f.scopes.required.some((s) => s.startsWith("write:")), `${f.name} needs a write scope`);
+    }
+  }
+});
+
+test("scopes follow the mapping from Whatnot's reference", () => {
+  const by = Object.fromEntries(FUNCTIONS.map((f) => [f.name, f.scopes]));
+  assert.deepEqual(by.get_show_analytics, { required: ["read:reports"], inferred: false });
+  assert.deepEqual(by.list_a_product_s_shows, { required: ["read:merchandising", "read:shows"], inferred: false });
+  assert.deepEqual(by.list_dimension_profiles, { required: ["read:inventory"], inferred: false });
+  assert.deepEqual(by.create_a_product, { required: ["write:inventory"], inferred: true });
+  assert.deepEqual(by.set_inventory, { required: ["write:inventory"], inferred: true });
+  assert.deepEqual(by.get_a_shipment, { required: ["read:shipments"], inferred: false });
+  assert.deepEqual(by.list_shipments, { required: ["read:shipments"], inferred: true });
+  assert.deepEqual(by.request_a_shipping_label, { required: ["write:shipments"], inferred: true });
+  assert.deepEqual(by.add_a_tracking_code_to_order_items, { required: ["write:shipments"], inferred: false });
+  assert.deepEqual(by.cancel_an_order, { required: ["write:orders"], inferred: false });
+  assert.deepEqual(by.generate_a_report, { required: ["write:reports"], inferred: false });
+});
+
+test("orders and shipments reads that carry buyer fields are marked customerFields", () => {
+  const expected = [
+    "list_orders",
+    "get_an_order",
+    "list_order_items",
+    "get_an_order_item",
+    "list_shipments",
+    "get_a_shipment",
+    "list_shipment_items",
+    "get_a_shipment_item",
+  ];
+  assert.deepEqual(FUNCTIONS.filter((f) => f.customerFields === true).map((f) => f.name).sort(), expected.sort());
 });

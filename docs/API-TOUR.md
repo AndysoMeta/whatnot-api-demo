@@ -10,6 +10,10 @@ seller, what you give it, what comes back, and its safety class:
 - **write** creates or changes your own product data. Only run on the demo product.
 - **destructive** cancels, spends money, deletes or disconnects.
 
+One note before the tour. Whatnot's reference lists a 35th operation, `GET /`, a
+health check. It also needs a token, and it is not in the connector, so it is
+not one of the 34 functions here.
+
 Lists give you up to 50 results at a time (you ask with `limit`) plus a
 `next_cursor` to fetch the next page. `reverse` flips the order.
 
@@ -220,8 +224,9 @@ impossible id "1" to capture the real error. Safety class: destructive.
 ## How the recorded run was made
 
 The run was made once, through the Whatnot connector in Claude, against your
-private test show. One call per second, because Whatnot allows about two
-calls a second.
+private test show. One call per second, to stay well inside the limits. Whatnot's guide
+says 10 requests a second per seller per app, and the connector reported a
+lower policy of 2 a second. See `LIMITS-AND-PAGING.md`.
 
 1. **Reads.** The harmless functions first: current user, shows, analytics,
    reports, products, shipping sizes, then orders and shipments. Order and

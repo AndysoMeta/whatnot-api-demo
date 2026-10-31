@@ -1,6 +1,8 @@
 // Whatnot API Demo explorer UI. Plain browser JavaScript, no build step.
 // Everything from fixtures is shown with textContent, never as HTML.
 
+import { buildSnippets } from "./snippets.mjs";
+
 const NO_TOKEN_MESSAGE = "No API token set. Paste your Seller API token in the box at the top of the page to run live. Recorded responses are shown instead.";
 const TOKEN_KEY = "whatnot-api-demo.token";
 const WRITE_LABEL = "I understand this changes data on my Whatnot account";
@@ -15,6 +17,7 @@ const state = {
   tokens: {},
   liveTokens: {},
   status: { token: false, allowWrites: false },
+  scopes: [],
   pageToken: "",
   tokenStored: false,
 };
@@ -265,7 +268,7 @@ function whatnotSaid(body) {
 
 // A status code from Whatnot, in plain words.
 function plainStatus(code) {
-  if (code === 401) return "Whatnot answered 401: the token is wrong or has expired. Get a fresh one at developers.whatnot.com and paste it again.";
+  if (code === 401) return "Whatnot answered 401: the token is wrong or has expired. Make a fresh one in your Whatnot dashboard (Developer, Personal access tokens) and paste it again.";
   if (code === 403) return "Whatnot answered 403: the token works but is not allowed to do this. Check the permissions the token was given.";
   if (code === 404) return "Whatnot answered 404: nothing was found at that address or id.";
   if (code === 429) return "Whatnot answered 429: too many calls at once. Wait a moment and try again.";
@@ -500,7 +503,218 @@ function recordedBlock(f, { showArgs = true } = {}) {
 
 // ---------- explorer detail ----------
 
-function runBlock(f) {
+// ---------- permissions ----------
+
+function scopeCode(name) {
+  const known = state.scopes.find((s) => s.name === name);
+  return el("code", { class: "scope", title: known ? known.meaning : null, text: name });
+}
+
+function joinWords(nodes) {
+  const out = [];
+  nodes.forEach((n, i) => {
+    if (i > 0) out.push(i === nodes.length - 1 ? " and " : ", ");
+    out.push(n);
+  });
+  return out;
+}
+
+function permissionsBlock(f) {
+  const scopes = f.scopes || { required: [], inferred: false };
+  const required = Array.isArray(scopes.required) ? scopes.required : [];
+  const lines = [];
+  if (!required.length) {
+    lines.push(el("p", { class: "perm-line", text: "Any token works." }));
+  } else {
+    const isWrite = required.some((s) => s.startsWith("write:"));
+    lines.push(
+      el(
+        "p",
+        { class: "perm-line" },
+        "Your token needs: ",
+        joinWords(required.map(scopeCode)),
+        ".",
+        isWrite ? " (Write includes read.)" : "",
+      ),
+    );
+    if (scopes.inferred) {
+      lines.push(el("p", { class: "hint", text: "Whatnot's reference does not state this one; it is the permission for this group." }));
+    }
+  }
+  if (f.customerFields) {
+    lines.push(el("p", { class: "hint" }, "Buyer and address fields come back empty without ", scopeCode("read:customers"), "."));
+  }
+  return el("div", { class: "perm" }, el("h4", { text: "Permissions" }), lines);
+}
+
+// ---------- code snippets ----------
+
+const CODE_TAB_KEY = "whatnot-demo-code-tab";
+const CODE_TABS = [
+  { id: "curl", label: "curl" },
+  { id: "javascript", label: "JavaScript" },
+  { id: "python", label: "Python" },
+  { id: "http", label: "Raw request" },
+];
+
+function loadCodeTab() {
+  try {
+    const v = window.sessionStorage.getItem(CODE_TAB_KEY);
+    return CODE_TABS.some((t) => t.id === v) ? v : "curl";
+  } catch {
+    return "curl";
+  }
+}
+
+function saveCodeTab(id) {
+  try {
+    window.sessionStorage.setItem(CODE_TAB_KEY, id);
+  } catch {
+    // Storage may be blocked; the tab then goes back to curl on the next page.
+  }
+}
+
+function copyFallback(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.className = "offscreen";
+  document.body.append(area);
+  area.select();
+  let ok = false;
+  try {
+    ok = document.execCommand("copy");
+  } catch {
+    ok = false;
+  }
+  area.remove();
+  return ok;
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fall through to the older way
+  }
+  return copyFallback(text);
+}
+
+// Returns { node, update(args, problem) }. update() rebuilds the four snippets
+// from the same args object the Run live button would send.
+function codeBlock(f) {
+  let active = loadCodeTab();
+  let snippets = { curl: "", javascript: "", python: "", http: "" };
+  const pre = el("pre", { class: "code", id: "code-panel", role: "tabpanel", tabindex: "0" });
+  const note = el("p", { class: "hint", "aria-live": "polite" });
+  const copyBtn = el("button", { type: "button", class: "copy", text: "Copy" });
+  let copyTimer = null;
+  const tabs = CODE_TABS.map((t) =>
+    el("button", {
+      type: "button",
+      role: "tab",
+      id: `code-tab-${t.id}`,
+      "aria-controls": "code-panel",
+      class: "tab",
+      text: t.label,
+      onclick: () => select(t.id, false),
+      onkeydown: (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        const i = CODE_TABS.findIndex((x) => x.id === active);
+        const next = (i + (e.key === "ArrowRight" ? 1 : CODE_TABS.length - 1)) % CODE_TABS.length;
+        select(CODE_TABS[next].id, true);
+      },
+    }),
+  );
+
+  function paint() {
+    tabs.forEach((b, i) => {
+      const on = CODE_TABS[i].id === active;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", String(on));
+      b.tabIndex = on ? 0 : -1;
+    });
+    pre.setAttribute("aria-labelledby", `code-tab-${active}`);
+    pre.textContent = snippets[active];
+  }
+
+  function select(id, focus) {
+    active = id;
+    saveCodeTab(id);
+    paint();
+    if (focus) tabs[CODE_TABS.findIndex((t) => t.id === id)].focus();
+  }
+
+  copyBtn.addEventListener("click", async () => {
+    const ok = await copyText(snippets[active]);
+    copyBtn.textContent = ok ? "Copied" : "Copy failed";
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => {
+      copyBtn.textContent = "Copy";
+    }, 2000);
+  });
+
+  function update(args, problem) {
+    if (args) {
+      snippets = buildSnippets({
+        method: f.method,
+        path: f.path,
+        base: state.base,
+        params: f.params,
+        args,
+        secrets: state.pageToken ? [state.pageToken] : [],
+      });
+    }
+    note.textContent = problem || "Your token is never put in the code. Set WHATNOT_API_KEY to your token before you run it.";
+    paint();
+  }
+
+  const node = el(
+    "div",
+    { class: "block" },
+    el("div", { class: "code-head" }, el("h3", { text: "Code" }), copyBtn),
+    el("div", { class: "tabs", role: "tablist", "aria-label": "Code language" }, tabs),
+    pre,
+    note,
+  );
+  return { node, update };
+}
+
+function plural(n, word) {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
+}
+
+// "Rate limit: 10 per second, 7 left, resets in 1 second." plus the request id.
+// Returns null when Whatnot sent none of these headers.
+function headersLine(headers) {
+  if (!headers || typeof headers !== "object") return null;
+  const parts = [];
+  const limitRaw = headers["ratelimit-limit"];
+  const limit = limitRaw != null ? String(limitRaw).match(/\d+/) : null;
+  const remaining = headers["ratelimit-remaining"];
+  const reset = headers["ratelimit-reset"];
+  const bits = [];
+  if (limit) {
+    const w = String(limitRaw).match(/;\s*w=(\d+)/);
+    const secs = w ? Number(w[1]) : 1;
+    bits.push(`${limit[0]} per ${secs === 1 ? "second" : plural(secs, "second")}`);
+  }
+  if (remaining != null && remaining !== "") bits.push(`${remaining} left`);
+  if (reset != null && reset !== "" && Number.isFinite(Number(reset))) bits.push(`resets in ${plural(Number(reset), "second")}`);
+  if (bits.length) parts.push(`Rate limit: ${bits.join(", ")}.`);
+  const retry = headers["retry-after"];
+  if (retry != null && retry !== "" && Number.isFinite(Number(retry))) {
+    parts.push(`Whatnot asks you to wait ${plural(Number(retry), "second")} before trying again.`);
+  }
+  if (headers["x-request-id"]) parts.push(`Request id: ${headers["x-request-id"]}. Quote it if you write to Whatnot support.`);
+  return parts.length ? el("p", { class: "hint headers-line", text: parts.join(" ") }) : null;
+}
+
+function runBlock(f, onArgs = () => {}) {
   const demoArgs = resolveTokens(f.demo, effectiveTokens());
   const textarea = el("textarea", { id: "args", spellcheck: "false", "aria-describedby": "args-hint" });
   textarea.value = pretty(demoArgs);
@@ -515,6 +729,25 @@ function runBlock(f) {
   }
   textarea.addEventListener("input", updateHint);
   updateHint();
+
+  // The code block follows the textarea, about 200 ms after typing stops.
+  function sendArgs() {
+    try {
+      const parsed = JSON.parse(textarea.value || "{}");
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        onArgs(null, "The args must be a JSON object, like {}. The code shows the last good version.");
+      } else {
+        onArgs(parsed, "");
+      }
+    } catch {
+      onArgs(null, "The args are not valid JSON yet. The code shows the last good version.");
+    }
+  }
+  let argsTimer = null;
+  textarea.addEventListener("input", () => {
+    clearTimeout(argsTimer);
+    argsTimer = setTimeout(sendArgs, 200);
+  });
 
   // Both boxes are rebuilt with each function, so they reset when you pick another one.
   const writeBox = el("input", { type: "checkbox", id: "allow-writes" });
@@ -548,6 +781,7 @@ function runBlock(f) {
     onclick: () => {
       textarea.value = pretty(resolveTokens(f.demo, effectiveTokens()));
       updateHint();
+      sendArgs();
       result.replaceChildren();
     },
   });
@@ -594,6 +828,7 @@ function runBlock(f) {
           ok ? "" : el("p", { class: "msg warn", text: plainStatus(data.status) }),
           remembered ? el("p", { class: "msg ok", text: remembered }) : "",
           el("pre", { text: pretty(data.body ?? null), "aria-label": "Live response body" }),
+          headersLine(data.headers),
         );
       }
     } catch (err) {
@@ -604,12 +839,19 @@ function runBlock(f) {
   });
 
   children.push(el("div", { class: "row" }, runBtn, resetBtn), result);
-  return el("div", { class: "block" }, children);
+  const node = el("div", { class: "block" }, children);
+  node.sendArgs = sendArgs;
+  return node;
 }
 
 function renderDetail(f) {
   const detail = document.getElementById("detail");
-  detail.replaceChildren(...headerBlock(f), requestBlock(f), paramsBlock(f), runBlock(f), recordedBlock(f));
+  const request = requestBlock(f);
+  request.append(permissionsBlock(f));
+  const code = codeBlock(f);
+  const run = runBlock(f, code.update);
+  detail.replaceChildren(...headerBlock(f), request, paramsBlock(f), run, code.node, recordedBlock(f));
+  run.sendArgs();
 }
 
 // ---------- tour ----------
@@ -702,6 +944,7 @@ async function start() {
     state.tags = catalog.tags;
     state.functions = catalog.functions;
     state.byName = new Map(catalog.functions.map((f) => [f.name, f]));
+    state.scopes = Array.isArray(catalog.scopes) ? catalog.scopes : [];
     state.status = status;
   } catch (err) {
     document.getElementById("status").textContent = `Could not load the catalog: ${err.message}`;

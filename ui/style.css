@@ -210,3 +210,39 @@ details summary { cursor: pointer; color: var(--muted); }
 .tour-nav { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin: 0 0 12px; }
 
 .foot { padding: 12px 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem; }
+
+/* Permissions, under the Request block */
+.perm { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.perm h4 { margin: 0 0 4px; font-size: 0.95rem; }
+.perm .perm-line { margin: 0 0 4px; }
+.perm .hint { margin: 2px 0; }
+code.scope {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.85rem;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0 4px;
+  overflow-wrap: anywhere;
+}
+
+/* Code block with language tabs */
+.code-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.code-head h3 { margin: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs .tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+pre.code { max-width: 100%; }
+.headers-line { overflow-wrap: anywhere; }
+.offscreen { position: fixed; left: -9999px; top: 0; opacity: 0; }
+
+/* Narrow screens: one column, nothing wider than the screen */
+@media (max-width: 760px) {
+  .top { flex-wrap: wrap; gap: 8px 16px; padding: 12px 16px; }
+  .status { margin: 0; text-align: left; flex-basis: 100%; }
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .token-card { margin: 12px 16px 4px; }
+  .side { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--line); }
+  .detail, .tour { padding: 16px 16px 32px; }
+  td code { white-space: normal; overflow-wrap: anywhere; }
+  .tour-nav { flex-wrap: wrap; }
+}

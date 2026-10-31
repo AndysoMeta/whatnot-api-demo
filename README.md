@@ -32,12 +32,16 @@ Nothing to install. To use a different port, set `PORT` first.
 
 Without a token the explorer shows the recorded answers and "Run live" says
 plainly that no token is set. To run functions live against your own Whatnot
-account you need a Seller API access token.
+account you need a Seller API token.
 
-1. **Get a token.** Whatnot issues Seller API access tokens to developer apps
-   at https://developers.whatnot.com. They come from Whatnot's sign-in for
-   developer apps, not as a fixed key, so a token expires and you will need a
-   fresh one now and then.
+1. **Get a token.** Make a personal access token in your Whatnot dashboard, on
+   the Developer tab, under Personal access tokens:
+   https://www.whatnot.com/dashboard/developer?tab=tokens. Press Generate new
+   token, pick an expiration and the permissions you want, and copy the token
+   straight away, because Whatnot shows it once. It starts with `wn_pat_tk_`.
+   A token can expire, so you may need a fresh one now and then. The full
+   step by step, including which permissions to tick, is in
+   `docs/GETTING-A-TOKEN.md`.
 2. **Paste it in the page.** At the top of the explorer is a "Your API token"
    box. Paste the token, press "Save token", then "Test token". If the token
    works the page says "Signed in as" and your username. If Whatnot answers 401,
@@ -81,6 +85,38 @@ pasted in the page wins over the environment one.
   the ids it used and the cleanup result).
 - Buyer names and addresses in orders and shipments are blanked in the fixtures.
 - `docs/API-TOUR.md` is a plain-English walkthrough of all 34 functions.
+- `spec/NOTES.md` holds the facts gathered from Whatnot's developer guide.
 - `CONTRACT.md` is the shared spec the pieces were built from.
 
 To test the code itself, run `npm test`.
+
+## For developers
+
+If you want to build your own tool on the Seller API, start here.
+
+Guides in `docs/`:
+
+- `docs/GETTING-A-TOKEN.md`: make a token, the 12 permissions (scopes), and the
+  OAuth basics for apps that act for other sellers.
+- `docs/LIMITS-AND-PAGING.md`: the rate limit, what to do on a 429, and how
+  paging with `limit`, `cursor` and `reverse` works.
+- `docs/ERRORS.md`: the error shapes, every problem type, 207 batch answers,
+  retries and `idempotency_key`.
+- `docs/WEBHOOKS.md`: the events Whatnot can send you and how to check their
+  signatures.
+- `docs/RECIPES.md`: five walkthroughs that chain functions, with curl for
+  every step.
+- `docs/API-TOUR.md`: the plain-English tour of all 34 functions.
+- `docs/EXPLORER.md`: how the explorer page works.
+
+Other things in the project:
+
+- `spec/openapi.json` is Whatnot's own OpenAPI document (version 3.1.0, API
+  version 2.0.0), downloaded on 2026-10-31 from
+  https://developers.whatnot.com/api-reference/openapi.json. It is Whatnot's
+  file, saved here unchanged so you can read it offline.
+- `examples/` has small programs to start from: a first-call script in Node, a
+  first-call script in Python, a paging example, and a webhook receiver
+  (`examples/webhook-receiver.mjs`, which checks Whatnot's signatures).
+- For every function, the explorer shows copyable curl, JavaScript and Python
+  for the request, plus the permissions that function needs.

@@ -171,3 +171,27 @@ and need no redaction.
 - Nothing is posted to Whatnot chat and nothing is clicked in Whatnot.
   The only Whatnot writes allowed are the Seller API calls described
   above, on the demo product only.
+
+## Developer additions (third pass, 2026-10-31)
+
+Source of truth for API facts: `spec/NOTES.md` (gathered from
+developers.whatnot.com) and `spec/openapi.json` (Whatnot's OpenAPI 3.1
+document, version 2.0.0, 35 operations: our 34 plus `GET /` health check,
+which also needs a token and is not in the connector).
+
+- `catalog.mjs`: every function carries `scopes: { required: [...], inferred }`
+  and the orders/shipments reads carry `customerFields: true`; `SCOPES` lists
+  the 12 scopes with Whatnot's meaning.
+- `ui/snippets.mjs`: `buildSnippets()` returns curl, JavaScript (Node fetch),
+  Python (stdlib) and a raw HTTP request for the selected function and the
+  current args. The token never appears; snippets read `WHATNOT_API_KEY`.
+- Explorer detail: Permissions line, Code block with four tabs and Copy,
+  live results show the RateLimit headers and the request id.
+- `server.mjs`: sends `X-Request-ID`, returns a whitelisted `headers` object
+  with a live result (ratelimit-*, retry-after, x-request-id, content-type).
+- `docs/`: GETTING-A-TOKEN, LIMITS-AND-PAGING, ERRORS, WEBHOOKS, RECIPES.
+- `examples/`: first-call (Node and Python), list-all-products (paging),
+  verify-webhook + webhook-receiver + send-test-webhook (port 7491 default).
+- Rate limit per the guide is 10 per second per seller per app; the recorded
+  connector run saw a 2 per second policy. The proxy still paces to 1 per
+  second.

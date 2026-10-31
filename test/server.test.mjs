@@ -437,3 +437,90 @@ test("Origin: none passes, this server's own origin passes, a foreign one is 403
   }
   assert.equal(calls.length, 3, "a foreign page never reaches Whatnot");
 });
+
+// ---------- response headers and X-Request-ID ----------
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+test("only whitelisted upstream headers reach the page", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN });
+  clock += 5000;
+  replies.push({
+    status: 200,
+    body: { ok: true },
+    headers: {
+      "set-cookie": "session=abc; HttpOnly",
+      "ratelimit-limit": "10, 10;w=1",
+      "ratelimit-remaining": "7",
+      "ratelimit-reset": "1",
+      "x-request-id": "whatnot-echoed-id",
+      "x-internal-trace": "secret-thing",
+      server: "cloudflare",
+    },
+  });
+  const r = await run({ name: "list_products", args: {} });
+  assert.equal(r.code, 200);
+  assert.deepEqual(r.data.headers, {
+    "ratelimit-limit": "10, 10;w=1",
+    "ratelimit-remaining": "7",
+    "ratelimit-reset": "1",
+    "x-request-id": "whatnot-echoed-id",
+    "content-type": "application/json",
+  });
+  assert.ok(!r.text.includes("session=abc"));
+  assert.ok(!r.text.includes("secret-thing"));
+  assert.ok(!/set-cookie/i.test(r.text));
+});
+
+test("every upstream request sends its own X-Request-ID", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN });
+  clock += 5000;
+  await run({ name: "get_the_current_user", args: {} });
+  clock += 5000;
+  await run({ name: "get_the_current_user", args: {} });
+  assert.equal(calls.length, 2);
+  const a = calls[0].init.headers["X-Request-ID"];
+  const b = calls[1].init.headers["X-Request-ID"];
+  assert.match(a, UUID_RE);
+  assert.match(b, UUID_RE);
+  assert.notEqual(a, b);
+});
+
+test("with no request id echoed, the reply carries the one we sent", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN });
+  clock += 5000;
+  replies.push({ status: 404, body: { type: "show-not-found" } });
+  const r = await run({ name: "get_a_show", args: { show_id: "x" } });
+  assert.equal(r.data.status, 404);
+  assert.equal(r.data.headers["x-request-id"], calls[0].init.headers["X-Request-ID"]);
+  assert.equal(r.data.headers["ratelimit-limit"], undefined, "absent headers stay absent");
+});
+
+test("a 429 retry sends a fresh request id and reports retry-after", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN });
+  clock += 5000;
+  replies.push({ status: 429, body: {}, headers: { "retry-after": "2" } });
+  replies.push({ status: 429, body: {}, headers: { "retry-after": "2", "ratelimit-reset": "2" } });
+  const r = await run({ name: "list_orders", args: {} });
+  assert.equal(calls.length, 2);
+  assert.notEqual(calls[0].init.headers["X-Request-ID"], calls[1].init.headers["X-Request-ID"]);
+  assert.equal(r.data.headers["x-request-id"], calls[1].init.headers["X-Request-ID"]);
+  assert.equal(r.data.headers["retry-after"], "2");
+});
+
+test("catalog route carries scopes on every function and the SCOPES list", async () => {
+  const data = await (await fetch(`${base}/api/catalog`)).json();
+  assert.equal(data.scopes.length, 12);
+  assert.ok(typeof data.scopesNote === "string");
+  for (const f of data.functions) {
+    assert.ok(Array.isArray(f.scopes.required), f.name);
+    assert.equal(typeof f.scopes.inferred, "boolean", f.name);
+  }
+});
+
+test("the snippets module is served to the page", async () => {
+  const res = await fetch(`${base}/snippets.mjs`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-type"), /text\/javascript/);
+  assert.match(await res.text(), /export function buildSnippets/);
+});
