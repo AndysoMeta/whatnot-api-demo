@@ -1,6 +1,8 @@
 // Whatnot API Demo explorer server. Zero dependencies, Node 22+.
 // Serves the UI, the catalog, the recorded fixtures, and a gated live proxy
-// to the Whatnot Seller REST API. The token is never logged or echoed.
+// to the Whatnot Seller REST API. The token comes from the X-Whatnot-Token
+// request header (pasted in the page) or env WHATNOT_API_KEY. It is never
+// logged, stored or echoed.
 
 import http from "node:http";
 import { readFile, readdir, stat } from "node:fs/promises";
@@ -13,13 +15,20 @@ export const DEFAULT_PORT = 7490;
 export const FORBIDDEN_PORTS = new Set([7474, 7475, 7477, 7480, 3000]);
 
 export const MESSAGES = {
-  no_token: "No API token set. Add WHATNOT_API_KEY to run live. Recorded responses are shown instead.",
+  no_token: "No API token set. Paste your Seller API token in the box at the top of the page to run live. Recorded responses are shown instead.",
   never_run:
     "This function is never run from here. It would disconnect this app from the seller account and break the Whatnot connection until it is set up again. The recorded entry explains it instead.",
-  writes_off: "This function changes data on Whatnot. Start the server with ALLOW_WRITES=true to run it live.",
+  writes_off:
+    "This function changes data on Whatnot. Tick the box saying you understand it changes data on your Whatnot account to run it live.",
   confirm_required:
     "This function can cancel, ship, charge or delete for real. Tick the confirm box to run it live.",
+  token_too_long: "That token is too long. A Seller API token is well under 4096 characters, so check what was pasted.",
+  bad_token: "That token has spaces or characters a Seller API token never has. Copy it again and paste it.",
+  bad_origin: "This server only answers the page it serves itself, at http://localhost on this computer.",
 };
+
+export const TOKEN_HEADER = "x-whatnot-token";
+export const MAX_TOKEN_LENGTH = 4096;
 
 const MIN_GAP_MS = 1000; // Whatnot allows 2 per second; stay at 1 per second.
 const MAX_RETRY_WAIT_MS = 60_000;
@@ -134,8 +143,11 @@ const TYPES = {
   ".json": "application/json; charset=utf-8",
 };
 
-function send(res, code, data) {
-  const text = JSON.stringify(data);
+// With a token given, any copy of it in the reply becomes [token]. Very short
+// tokens are skipped here so an ordinary reply is not mangled.
+function send(res, code, data, token) {
+  const json = JSON.stringify(data);
+  const text = token && token.length >= 8 ? scrub(json, token) : json;
   res.writeHead(code, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
   res.end(text);
 }
@@ -182,6 +194,30 @@ async function serveStatic(res, uiDir, pathname) {
   }
 }
 
+// Picks the token: X-Whatnot-Token header first, then env WHATNOT_API_KEY.
+// Returns { token } or { error } and never puts the token in an error.
+export function pickToken(req, env) {
+  const raw = req.headers[TOKEN_HEADER];
+  const fromHeader = String(Array.isArray(raw) ? raw.join(",") : raw ?? "").trim();
+  const token = fromHeader || String(env.WHATNOT_API_KEY ?? "").trim();
+  if (token.length > MAX_TOKEN_LENGTH) return { error: "token_too_long" };
+  if (token && !/^[\x21-\x7e]+$/.test(token)) return { error: "bad_token" };
+  return { token };
+}
+
+// The page this server serves is the only browser page allowed to call it.
+// A request with no Origin (curl, the tests, same-origin GETs) is fine.
+export function originAllowed(origin, port) {
+  if (origin == null || origin === "") return true;
+  return origin === `http://localhost:${port}` || origin === `http://127.0.0.1:${port}`;
+}
+
+function scrub(value, token) {
+  if (!token) return value;
+  const escaped = JSON.stringify(token).slice(1, -1);
+  return value.replaceAll(token, "[token]").replaceAll(escaped, "[token]");
+}
+
 // ---------- app ----------
 
 export function createApp({
@@ -202,14 +238,17 @@ export function createApp({
     } catch (err) {
       return send(res, 400, { error: err.message, message: "The request was not valid JSON." });
     }
+    const picked = pickToken(req, env);
+    if (picked.error) return send(res, 400, { error: picked.error, message: MESSAGES[picked.error] });
+    const token = picked.token;
+
     const fn = BY_NAME.get(input?.name);
     if (!fn) return send(res, 404, { error: "unknown_function", message: "There is no function with that name." });
     if (NEVER_RUN.has(fn.name)) return send(res, 403, { error: "never_run", message: MESSAGES.never_run });
 
-    const token = String(env.WHATNOT_API_KEY ?? "").trim();
     if (!token) return send(res, 409, { error: "no_token", message: MESSAGES.no_token });
 
-    if (fn.safety !== "read" && env.ALLOW_WRITES !== "true") {
+    if (fn.safety !== "read" && input.allowWrites !== true && env.ALLOW_WRITES !== "true") {
       return send(res, 403, { error: "writes_off", message: MESSAGES.writes_off });
     }
     if (fn.safety === "destructive" && input.confirm !== true) {
@@ -240,18 +279,23 @@ export function createApp({
     try {
       const result = await proxy({ ...built, token });
       log(`run ${fn.name} ${fn.method} ${built.url.pathname} -> ${result.status}`);
-      return send(res, 200, { ...result, method: fn.method, url: built.url.toString() });
+      return send(res, 200, { ...result, method: fn.method, url: built.url.toString() }, token);
     } catch (err) {
       log(`run ${fn.name} -> network error`);
-      return send(res, 502, {
-        error: "network_error",
-        message: `Could not reach Whatnot: ${String(err?.message || err).replaceAll(token, "[token]")}`,
-      });
+      return send(
+        res,
+        502,
+        { error: "network_error", message: `Could not reach Whatnot: ${scrub(String(err?.message || err), token)}` },
+        token,
+      );
     }
   }
 
   return async function handler(req, res) {
     try {
+      if (!originAllowed(req.headers.origin, req.socket.localPort)) {
+        return send(res, 403, { error: "bad_origin", message: MESSAGES.bad_origin });
+      }
       const { pathname } = new URL(req.url, "http://local");
       if (req.method === "GET" && pathname === "/api/catalog") {
         return send(res, 200, { base: BASE_URL, tags: TAGS, functions: FUNCTIONS });
@@ -312,7 +356,7 @@ if (isMain) {
       const { port } = server.address();
       const token = Boolean(String(process.env.WHATNOT_API_KEY ?? "").trim());
       console.log(`Whatnot API Demo on http://localhost:${port}`);
-      console.log(`Live runs: ${token ? "token set" : "no token, recorded responses only"}. Writes: ${process.env.ALLOW_WRITES === "true" ? "on" : "off"}.`);
+      console.log(`Token from env: ${token ? "set" : "none, paste one in the page to run live"}. Writes from env: ${process.env.ALLOW_WRITES === "true" ? "on" : "off, the page asks each time"}.`);
     })
     .catch((err) => {
       console.error(err.message);

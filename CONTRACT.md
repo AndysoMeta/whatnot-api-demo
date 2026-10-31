@@ -16,7 +16,8 @@ REST token on disk. So:
 - The **recorded run** (fixtures/) is made through the MCP connector by a
   Claude agent, once, against Andy's private test show.
 - The **explorer app** shows each function, its request, the recorded live
-  response, and can run it live against REST when `WHATNOT_API_KEY` is set.
+  response, and can run it live against REST with a token the user pastes
+  into the page (or `WHATNOT_API_KEY` in the environment).
 - The **/whatnot-api skill** lets Claude re-run any function live through
   the MCP connector and refresh its fixture.
 
@@ -126,11 +127,27 @@ and need no redaction.
   `{{PRODUCT_ID}}`, `{{VARIANT_ID}}`, `{{REPORT_ID}}` resolved from
   `_run.json` at runtime).
 - `GET /api/catalog`, `GET /api/fixtures` (all), `GET /api/fixtures/:name`,
-  `POST /api/run` `{name, args}` proxies to REST with the Bearer token.
-  Without `WHATNOT_API_KEY` it answers 409 `{error:"no_token"}` and the UI
-  says so plainly. `write` needs env `ALLOW_WRITES=true`; `destructive`
-  additionally needs `{confirm:true}` in the POST and is refused for
-  `disconnect_the_current_application` always.
+  `POST /api/run` `{name, args, allowWrites?, confirm?}` proxies to REST
+  with the Bearer token. The token comes from the `X-Whatnot-Token` request
+  header first, then env `WHATNOT_API_KEY`, trimmed; over 4096 characters
+  (or containing spaces or control characters) is a 400. With neither it
+  answers 409 `{error:"no_token"}` and the UI says so plainly. `write`
+  needs `allowWrites: true` (boolean) in the POST, or env
+  `ALLOW_WRITES=true` for the old setup; `destructive` additionally needs
+  `confirm: true` (boolean); `disconnect_the_current_application` is
+  refused always. The token is never logged, stored or echoed, and any copy
+  in a reply or error becomes `[token]`. `GET /api/status` reports only
+  whether an env token exists.
+- Origin: the server binds 127.0.0.1 and sends no CORS headers. Any request
+  whose `Origin` header is present and is not `http://localhost:<port>` or
+  `http://127.0.0.1:<port>` gets 403 `{error:"bad_origin"}`.
+- Token section in the UI: password input, Save token, Clear, Test token
+  (runs get_the_current_user, shows "Signed in as <username>" or Whatnot's
+  error in plain words), and "Remember on this computer" (off: the token is
+  in sessionStorage; on: localStorage). The status line shows at most the
+  last four characters. Write functions show the "I understand this changes
+  data on my Whatnot account" box (resets per function); destructive ones
+  add the red confirm box.
 - UI at `/`: functions grouped by tag on the left; detail on the right with
   summary, method + path, args editor (JSON textarea prefilled from demo),
   the recorded response (status + pretty body), and a "Run live" button.
@@ -139,7 +156,9 @@ and need no redaction.
 - Tests: `npm test` runs `node --test "test/*.test.mjs"`. Cover: catalog has exactly the
   34 names above with no duplicates; every entry has the required fields;
   server routes with an injected fake fetch (token missing, write gate,
-  destructive gate, disconnect always refused, token passed as Bearer);
+  destructive gate, disconnect always refused, token passed as Bearer,
+  header token beats env, over-long token, Origin check, no token in
+  errors);
   fixture loader tolerates a missing fixtures folder.
 
 ## Rules
@@ -148,7 +167,7 @@ and need no redaction.
 - No "Cadance", "Cadence", "Wave", "Claude" or "AI" in UI text. (The README
   and skill may say "Claude" since they describe the connector.)
 - Scratch files go in the agent's scratchpad, not in this project.
-- This folder has no git repo yet. Do not run git here.
+- This folder is its own git repo. Agents do not run git here; the main session commits.
 - Nothing is posted to Whatnot chat and nothing is clicked in Whatnot.
   The only Whatnot writes allowed are the Seller API calls described
   above, on the demo product only.

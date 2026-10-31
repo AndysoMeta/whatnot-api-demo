@@ -1,7 +1,9 @@
 // Whatnot API Demo explorer UI. Plain browser JavaScript, no build step.
 // Everything from fixtures is shown with textContent, never as HTML.
 
-const NO_TOKEN_MESSAGE = "No API token set. Add WHATNOT_API_KEY to run live. Recorded responses are shown instead.";
+const NO_TOKEN_MESSAGE = "No API token set. Paste your Seller API token in the box at the top of the page to run live. Recorded responses are shown instead.";
+const TOKEN_KEY = "whatnot-api-demo.token";
+const WRITE_LABEL = "I understand this changes data on my Whatnot account";
 
 const state = {
   base: "",
@@ -12,6 +14,8 @@ const state = {
   fixtures: {},
   tokens: {},
   status: { token: false, allowWrites: false },
+  pageToken: "",
+  tokenStored: false,
 };
 
 // ---------- small helpers ----------
@@ -102,14 +106,184 @@ function tourOrder() {
   return order;
 }
 
+// ---------- your API token ----------
+// The token lives only in this browser: sessionStorage by default, localStorage
+// when "Remember on this computer" is ticked. It is sent only to this page's own
+// server, in the X-Whatnot-Token header, which forwards it to api.whatnot.com.
+
+function storeFor(remember) {
+  try {
+    return remember ? window.localStorage : window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
+function storageGet(remember) {
+  try {
+    return storeFor(remember)?.getItem(TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function storageSet(remember, value) {
+  try {
+    const store = storeFor(remember);
+    if (!store) return false;
+    store.setItem(TOKEN_KEY, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function storageRemove(remember) {
+  try {
+    storeFor(remember)?.removeItem(TOKEN_KEY);
+  } catch {
+    // nothing stored, or storage blocked
+  }
+}
+
+function hasToken() {
+  return Boolean(state.pageToken) || Boolean(state.status.token);
+}
+
+function runHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  if (state.pageToken) headers["X-Whatnot-Token"] = state.pageToken;
+  return headers;
+}
+
+function postRun(payload) {
+  return fetch("/api/run", { method: "POST", headers: runHeaders(), body: JSON.stringify(payload) });
+}
+
+// The text Whatnot gave with an error, kept short.
+function whatnotSaid(body) {
+  if (body == null || body === "") return "";
+  if (typeof body === "string") return body.slice(0, 300);
+  const list = Array.isArray(body.errors) ? body.errors.map((e) => e?.message || e).join("; ") : "";
+  const m = body.message || body.error_description || body.detail || body.error || list;
+  return (typeof m === "string" && m ? m : JSON.stringify(body)).slice(0, 300);
+}
+
+// A status code from Whatnot, in plain words.
+function plainStatus(code) {
+  if (code === 401) return "Whatnot answered 401: the token is wrong or has expired. Get a fresh one at developers.whatnot.com and paste it again.";
+  if (code === 403) return "Whatnot answered 403: the token works but is not allowed to do this. Check the permissions the token was given.";
+  if (code === 404) return "Whatnot answered 404: nothing was found at that address or id.";
+  if (code === 429) return "Whatnot answered 429: too many calls at once. Wait a moment and try again.";
+  if (code >= 500) return `Whatnot answered ${code}: a problem on Whatnot's side. Try again later.`;
+  return `Whatnot answered ${code}.`;
+}
+
+function tokenEnding() {
+  const t = state.pageToken;
+  return t.length >= 8 ? ` (ends in ${t.slice(-4)})` : "";
+}
+
+function renderTokenStatus() {
+  const line = document.getElementById("token-status");
+  if (state.pageToken) {
+    line.textContent = state.tokenStored
+      ? `Token saved${tokenEnding()}. Live runs on.`
+      : `Token set for this page only${tokenEnding()}. Live runs on. This browser would not store it, so it is gone when you reload.`;
+  } else if (state.status.token) {
+    line.textContent = "No token pasted. The server has one from WHATNOT_API_KEY, so live runs are on.";
+  } else {
+    line.textContent = "No token. Recorded responses only.";
+  }
+  if (state.functions.length) renderStatus();
+}
+
+function setPageToken(value) {
+  const remember = document.getElementById("token-remember").checked;
+  storageRemove(true);
+  storageRemove(false);
+  state.pageToken = value;
+  state.tokenStored = value ? storageSet(remember, value) : false;
+  renderTokenStatus();
+}
+
+function tokenMessage(kind, text) {
+  const out = document.getElementById("token-test-result");
+  if (!text) out.replaceChildren();
+  else out.replaceChildren(el("p", { class: `msg ${kind}`, text }));
+}
+
+function saveTyped() {
+  const input = document.getElementById("token-input");
+  const value = input.value.trim();
+  if (!value) return false;
+  setPageToken(value);
+  input.value = "";
+  return true;
+}
+
+async function testToken() {
+  saveTyped();
+  if (!hasToken()) {
+    tokenMessage("warn", "Paste a token first, then press Test token.");
+    return;
+  }
+  const btn = document.getElementById("token-test");
+  btn.disabled = true;
+  tokenMessage("info", "Checking with Whatnot...");
+  try {
+    const res = await postRun({ name: "get_the_current_user", args: {} });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      tokenMessage("warn", data.message || `The local server said no (${res.status}).`);
+    } else if (data.status >= 200 && data.status < 300) {
+      const who = data.body?.username || data.body?.display_name || data.body?.id || "an account with no username";
+      tokenMessage("ok", `Signed in as ${who}.`);
+    } else {
+      const said = whatnotSaid(data.body);
+      tokenMessage("warn", `${plainStatus(data.status)}${said ? ` Whatnot said: ${said}` : ""}`);
+    }
+  } catch (err) {
+    tokenMessage("warn", `Could not reach the demo server: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function setupToken() {
+  const remember = document.getElementById("token-remember");
+  const remembered = storageGet(true);
+  if (remembered) {
+    state.pageToken = remembered;
+    remember.checked = true;
+  } else {
+    state.pageToken = storageGet(false);
+    remember.checked = false;
+  }
+  state.tokenStored = Boolean(state.pageToken);
+  document.getElementById("token-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (saveTyped()) tokenMessage("", "");
+    else tokenMessage("warn", "Paste a token in the box first.");
+  });
+  document.getElementById("token-clear").addEventListener("click", () => {
+    document.getElementById("token-input").value = "";
+    setPageToken("");
+    tokenMessage("info", "Token cleared from this browser.");
+  });
+  document.getElementById("token-test").addEventListener("click", testToken);
+  remember.addEventListener("change", () => {
+    if (state.pageToken) setPageToken(state.pageToken);
+  });
+  renderTokenStatus();
+}
+
 // ---------- header and list ----------
 
 function renderStatus() {
   const recorded = state.functions.filter((f) => state.fixtures[f.name]).length;
-  const live = state.status.token ? "Live runs: on" : "Live runs: off (no token)";
-  const writes = state.status.allowWrites ? "Writes: on" : "Writes: off";
-  document.getElementById("status").textContent =
-    `${live}. ${writes}. Recorded: ${recorded} of ${state.functions.length}.`;
+  const live = hasToken() ? "Live runs: on" : "Live runs: off (no token)";
+  document.getElementById("status").textContent = `${live}. Recorded: ${recorded} of ${state.functions.length}.`;
 }
 
 function renderList(current) {
@@ -248,23 +422,29 @@ function runBlock(f) {
   textarea.addEventListener("input", updateHint);
   updateHint();
 
+  // Both boxes are rebuilt with each function, so they reset when you pick another one.
+  const writeBox = el("input", { type: "checkbox", id: "allow-writes" });
   const confirmBox = el("input", { type: "checkbox", id: "confirm" });
   const children = [el("h3", { text: "Try it" }), el("label", { for: "args", text: "Args (JSON)" }), textarea, hint];
+  const neverRun = f.name === "disconnect_the_current_application";
+  const needsWrite = f.safety !== "read" && !neverRun;
+  const needsConfirm = f.safety === "destructive" && !neverRun;
 
-  if (f.name === "disconnect_the_current_application") {
+  if (neverRun) {
     children.push(
       el("p", {
         class: "msg warn",
         text: "This one is never run from here. It would disconnect this app from the seller account and break the Whatnot connection. The server refuses it every time.",
       }),
     );
-  } else if (f.safety === "destructive") {
-    children.push(
-      el("label", { class: "check", for: "confirm" }, confirmBox, "I understand this runs for real and may cancel, ship, charge or delete."),
-    );
   }
-  if (f.safety !== "read" && !state.status.allowWrites && f.name !== "disconnect_the_current_application") {
-    children.push(el("p", { class: "hint", text: "This changes data, so it also needs ALLOW_WRITES=true when the server starts." }));
+  if (needsWrite) {
+    children.push(el("label", { class: "check caution", for: "allow-writes" }, writeBox, WRITE_LABEL));
+  }
+  if (needsConfirm) {
+    children.push(
+      el("label", { class: "check danger", for: "confirm" }, confirmBox, "I understand this runs for real and may cancel, ship, charge or delete."),
+    );
   }
 
   const runBtn = el("button", { type: "button", class: "primary", text: "Run live" });
@@ -286,22 +466,37 @@ function runBlock(f) {
       result.replaceChildren(el("p", { class: "msg warn", text: `The args are not valid JSON: ${err.message}` }));
       return;
     }
+    // The page asks every time, even when the server was started with ALLOW_WRITES=true.
+    if (hasToken() && needsWrite && !writeBox.checked) {
+      result.replaceChildren(el("p", { class: "msg warn", text: `This changes data on Whatnot. Tick "${WRITE_LABEL}" to run it live.` }));
+      return;
+    }
+    if (hasToken() && needsConfirm && !confirmBox.checked) {
+      result.replaceChildren(el("p", { class: "msg warn", text: "This can cancel, ship, charge or delete for real. Tick the red confirm box to run it live." }));
+      return;
+    }
     runBtn.disabled = true;
     result.replaceChildren(el("p", { class: "hint", text: "Running..." }));
     try {
-      const res = await fetch("/api/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: f.name, args, confirm: confirmBox.checked === true }),
+      const res = await postRun({
+        name: f.name,
+        args,
+        allowWrites: needsWrite && writeBox.checked === true,
+        confirm: needsConfirm && confirmBox.checked === true,
       });
       const data = await res.json().catch(() => ({}));
       if (res.status === 409 && data.error === "no_token") {
-        result.replaceChildren(el("p", { class: "msg info", text: NO_TOKEN_MESSAGE }));
+        result.replaceChildren(
+          el("p", { class: "msg info", text: NO_TOKEN_MESSAGE }),
+          el("p", { class: "hint", text: "Or paste your token under Your API token at the top of the page." }),
+        );
       } else if (!res.ok) {
         result.replaceChildren(el("p", { class: "msg warn", text: data.message || `The server said no (${res.status}).` }));
       } else {
+        const ok = data.status >= 200 && data.status < 300;
         result.replaceChildren(
           el("p", { class: "hint" }, "Live response. Status ", statusCode(data.status), "."),
+          ok ? "" : el("p", { class: "msg warn", text: plainStatus(data.status) }),
           el("pre", { text: pretty(data.body ?? null), "aria-label": "Live response body" }),
         );
       }
@@ -416,6 +611,7 @@ async function start() {
     return;
   }
 
+  setupToken();
   document.getElementById("view-explorer").addEventListener("click", () => {
     location.hash = `#/fn/${lastFn || state.functions[0].name}`;
   });

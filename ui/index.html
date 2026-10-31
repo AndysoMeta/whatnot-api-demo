@@ -23,6 +23,20 @@
 
   <main id="content" tabindex="-1">
     <div id="explorer" class="layout">
+      <section class="token-card" aria-labelledby="token-h">
+        <h2 id="token-h">Your API token</h2>
+        <form id="token-form" class="token-row" autocomplete="off">
+          <label for="token-input">Seller API access token</label>
+          <input type="password" id="token-input" name="token" autocomplete="off" spellcheck="false" placeholder="Paste your token here">
+          <button type="submit" id="token-save" class="primary">Save token</button>
+          <button type="button" id="token-clear">Clear</button>
+          <button type="button" id="token-test">Test token</button>
+        </form>
+        <label class="check" for="token-remember"><input type="checkbox" id="token-remember"> Remember on this computer</label>
+        <p id="token-status" class="token-status" role="status">No token. Recorded responses only.</p>
+        <div id="token-test-result" aria-live="polite"></div>
+        <p class="hint">Get a token from Whatnot at <a href="https://developers.whatnot.com" target="_blank" rel="noopener noreferrer">developers.whatnot.com</a>. The token stays in this browser and is only ever sent to the local server on this computer, which forwards it to api.whatnot.com and nowhere else.</p>
+      </section>
       <aside class="side" aria-label="Functions">
         <div id="list"></div>
       </aside>

@@ -165,6 +165,34 @@ pre { margin: 8px 0 0; max-height: 480px; overflow: auto; white-space: pre; }
 textarea { width: 100%; min-height: 160px; resize: vertical; }
 label { font-weight: 600; display: block; margin-bottom: 4px; }
 label.check { font-weight: normal; display: flex; gap: 8px; align-items: center; margin: 10px 0; }
+label.check.caution, label.check.danger { padding: 8px 12px; border-radius: 6px; border: 1px solid; font-weight: 600; }
+label.check.caution { background: var(--write-bg); color: var(--write-fg); border-color: var(--write-fg); }
+label.check.danger { background: var(--danger-bg); color: var(--danger-fg); border-color: var(--danger-fg); }
+input[type="checkbox"] { width: 18px; height: 18px; margin: 0; flex: none; }
+
+.token-card {
+  grid-column: 1 / -1;
+  margin: 16px 24px 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.token-card h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.token-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.token-row label { flex-basis: 100%; margin: 0; }
+.token-row input {
+  flex: 1 1 280px;
+  min-width: 0;
+  font: inherit;
+  color: var(--text);
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.token-status { margin: 4px 0; font-weight: 600; }
+.token-card a { color: var(--accent); }
 details summary { cursor: pointer; color: var(--muted); }
 
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
@@ -172,6 +200,7 @@ details summary { cursor: pointer; color: var(--muted); }
 .msg { margin: 10px 0 0; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); }
 .msg.warn { border-color: var(--warn); color: var(--warn); }
 .msg.info { border-color: var(--line); }
+.msg.ok { border-color: var(--ok); color: var(--ok); }
 .code-ok { color: var(--ok); font-weight: 700; }
 .code-bad { color: var(--warn); font-weight: 700; }
 .note { margin: 8px 0; }

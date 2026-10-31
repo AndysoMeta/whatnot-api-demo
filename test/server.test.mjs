@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { startServer, MESSAGES } from "../server.mjs";
+import http from "node:http";
+import { startServer, MESSAGES, MAX_TOKEN_LENGTH } from "../server.mjs";
 
 const TOKEN = "test-token-abc123";
 
@@ -39,10 +40,10 @@ function reset(newEnv = {}) {
   replies = [];
 }
 
-async function run(payload) {
+async function run(payload, headers = {}) {
   const res = await fetch(`${base}/api/run`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(payload),
   });
   const text = await res.text();
@@ -277,4 +278,162 @@ test("UI files are served and paths outside ui are not", async () => {
 test("forbidden ports are refused", async () => {
   await assert.rejects(startServer({ port: 7474, env: {} }), /another project/);
   await assert.rejects(startServer({ port: 7480, env: {} }), /another project/);
+});
+
+// ---------- token from the page (X-Whatnot-Token header) ----------
+
+const PAGE_TOKEN = "page-token-xyz789";
+
+// Raw request so the Origin header is sent exactly as given.
+function rawPost(path, payload, headers = {}) {
+  const body = JSON.stringify(payload);
+  return new Promise((ok, fail) => {
+    const req = http.request(
+      `${base}${path}`,
+      { method: "POST", headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body), ...headers } },
+      (res) => {
+        const chunks = [];
+        res.on("data", (c) => chunks.push(c));
+        res.on("end", () => {
+          const text = Buffer.concat(chunks).toString("utf8");
+          ok({ code: res.statusCode, text, data: text ? JSON.parse(text) : null });
+        });
+      },
+    );
+    req.on("error", fail);
+    req.end(body);
+  });
+}
+
+test("header token is used and sent as Bearer with no env token", async () => {
+  reset({});
+  clock += 5000;
+  replies.push({ status: 200, body: { username: "someone" } });
+  const r = await run({ name: "get_the_current_user", args: {} }, { "X-Whatnot-Token": `  ${PAGE_TOKEN}  ` });
+  assert.equal(r.code, 200);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].init.headers.Authorization, `Bearer ${PAGE_TOKEN}`, "trimmed");
+  assert.ok(!r.text.includes(PAGE_TOKEN));
+  for (const line of logs) assert.ok(!line.includes(PAGE_TOKEN), line);
+});
+
+test("env token still works when no header is sent", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN });
+  clock += 5000;
+  await run({ name: "get_the_current_user", args: {} }, { "X-Whatnot-Token": "   " });
+  assert.equal(calls[0].init.headers.Authorization, `Bearer ${TOKEN}`);
+});
+
+test("header token beats the env token", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN });
+  clock += 5000;
+  await run({ name: "get_the_current_user", args: {} }, { "X-Whatnot-Token": PAGE_TOKEN });
+  assert.equal(calls[0].init.headers.Authorization, `Bearer ${PAGE_TOKEN}`);
+});
+
+test("an over-long or odd token is a 400 and never calls Whatnot", async () => {
+  reset({});
+  const long = "a".repeat(MAX_TOKEN_LENGTH + 1);
+  let r = await run({ name: "get_the_current_user", args: {} }, { "X-Whatnot-Token": long });
+  assert.equal(r.code, 400);
+  assert.equal(r.data.error, "token_too_long");
+  assert.ok(!r.text.includes(long));
+  r = await run({ name: "get_the_current_user", args: {} }, { "X-Whatnot-Token": "two words" });
+  assert.equal(r.code, 400);
+  assert.equal(r.data.error, "bad_token");
+  assert.equal(calls.length, 0);
+  clock += 5000;
+  r = await run({ name: "get_the_current_user", args: {} }, { "X-Whatnot-Token": "a".repeat(MAX_TOKEN_LENGTH) });
+  assert.equal(r.code, 200, "exactly the limit is fine");
+});
+
+test("status still reports only the env token, never a header token", async () => {
+  reset({});
+  const res = await fetch(`${base}/api/status`, { headers: { "X-Whatnot-Token": PAGE_TOKEN } });
+  const text = await res.text();
+  assert.ok(!text.includes(PAGE_TOKEN));
+  assert.deepEqual(JSON.parse(text), { token: false, allowWrites: false });
+});
+
+test("write needs allowWrites === true in the body (boolean only)", async () => {
+  reset({});
+  const h = { "X-Whatnot-Token": PAGE_TOKEN };
+  const body = { title: "API DEMO TEST ITEM" };
+  for (const allowWrites of [undefined, false, "true", 1]) {
+    const r = await run({ name: "create_a_product", args: { body }, allowWrites }, h);
+    assert.equal(r.code, 403, `allowWrites ${JSON.stringify(allowWrites)}`);
+    assert.equal(r.data.error, "writes_off");
+    assert.equal(r.data.message, MESSAGES.writes_off);
+  }
+  assert.equal(calls.length, 0);
+  clock += 5000;
+  replies.push({ status: 201, body: { id: "999" } });
+  const ok = await run({ name: "create_a_product", args: { body }, allowWrites: true }, h);
+  assert.equal(ok.code, 200);
+  assert.equal(ok.data.status, 201);
+  assert.equal(calls.length, 1);
+});
+
+test("destructive needs allowWrites and confirm, both boolean true", async () => {
+  reset({});
+  const h = { "X-Whatnot-Token": PAGE_TOKEN };
+  const args = { order_id: "1", body: { reason: "other" } };
+  let r = await run({ name: "cancel_an_order", args, confirm: true }, h);
+  assert.equal(r.data.error, "writes_off");
+  r = await run({ name: "cancel_an_order", args, allowWrites: true }, h);
+  assert.equal(r.data.error, "confirm_required");
+  r = await run({ name: "cancel_an_order", args, allowWrites: true, confirm: "true" }, h);
+  assert.equal(r.data.error, "confirm_required");
+  r = await run({ name: "cancel_an_order", args, allowWrites: "true", confirm: true }, h);
+  assert.equal(r.data.error, "writes_off");
+  assert.equal(calls.length, 0);
+  clock += 5000;
+  replies.push({ status: 404, body: { error: "not found" } });
+  r = await run({ name: "cancel_an_order", args, allowWrites: true, confirm: true }, h);
+  assert.equal(r.code, 200);
+  assert.equal(calls.length, 1);
+});
+
+test("disconnect is refused even with header token, allowWrites and confirm", async () => {
+  reset({ WHATNOT_API_KEY: TOKEN, ALLOW_WRITES: "true" });
+  const r = await run(
+    { name: "disconnect_the_current_application", args: {}, allowWrites: true, confirm: true },
+    { "X-Whatnot-Token": PAGE_TOKEN },
+  );
+  assert.equal(r.code, 403);
+  assert.equal(r.data.error, "never_run");
+  assert.equal(calls.length, 0);
+});
+
+test("a header token never appears in a 502 error", async () => {
+  reset({});
+  clock += 5000;
+  replies.push({ throw: `connect refused for Bearer ${PAGE_TOKEN} at api.whatnot.com` });
+  const r = await run({ name: "list_shows", args: {} }, { "X-Whatnot-Token": PAGE_TOKEN });
+  assert.equal(r.code, 502);
+  assert.equal(r.data.error, "network_error");
+  assert.ok(!r.text.includes(PAGE_TOKEN), r.text);
+  assert.match(r.data.message, /[token]/);
+});
+
+test("Origin: none passes, this server's own origin passes, a foreign one is 403", async () => {
+  const port = server.address().port;
+  const h = { "X-Whatnot-Token": PAGE_TOKEN };
+  reset({});
+  clock += 5000;
+  let r = await rawPost("/api/run", { name: "get_the_current_user", args: {} }, h);
+  assert.equal(r.code, 200, "no Origin");
+  for (const origin of [`http://localhost:${port}`, `http://127.0.0.1:${port}`]) {
+    clock += 5000;
+    r = await rawPost("/api/run", { name: "get_the_current_user", args: {} }, { ...h, Origin: origin });
+    assert.equal(r.code, 200, origin);
+  }
+  assert.equal(calls.length, 3);
+  for (const origin of ["https://evil.example", "http://localhost:1", `https://localhost:${port}`, "null"]) {
+    r = await rawPost("/api/run", { name: "get_the_current_user", args: {} }, { ...h, Origin: origin });
+    assert.equal(r.code, 403, origin);
+    assert.equal(r.data.error, "bad_origin");
+    assert.ok(!r.text.includes(PAGE_TOKEN));
+  }
+  assert.equal(calls.length, 3, "a foreign page never reaches Whatnot");
 });

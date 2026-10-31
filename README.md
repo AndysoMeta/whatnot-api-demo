@@ -1,11 +1,11 @@
 # Whatnot API Demo
 
-By Mood Swings Design.
+A free tool by Mood Swings Design.
 
 A small tool that shows every function of Whatnot's Seller API working for
 real. There are 34 functions. You can read what each one does, see the exact
-request and the real answer Whatnot gave when it was tried on your private test
-show, and (once you add a token) run it live yourself.
+request and the real answer Whatnot gave when it was tried on a private test
+show, and (once you paste your own token into the page) run it live yourself.
 
 ## Start it
 
@@ -28,23 +28,44 @@ Nothing to install. To use a different port, set `PORT` first.
   functions, `/whatnot-api get_a_show` to run one live through the connector and
   refresh its saved answer, or `/whatnot-api tour` to refresh all the read ones.
 
-## Adding a token later (optional)
+## Using your own token
 
 Without a token the explorer shows the recorded answers and "Run live" says
-plainly that no token is set. To run live from the page you need a Seller API
-access token. Whatnot issues these through its OAuth sign-in for developer apps
-(developers.whatnot.com), not as a static key, so the token expires and has to
-be refreshed. Start the tool with it:
+plainly that no token is set. To run functions live against your own Whatnot
+account you need a Seller API access token.
 
-    set WHATNOT_API_KEY=your-token-here
-    npm start
+1. **Get a token.** Whatnot issues Seller API access tokens to developer apps
+   at https://developers.whatnot.com. They come from Whatnot's sign-in for
+   developer apps, not as a fixed key, so a token expires and you will need a
+   fresh one now and then.
+2. **Paste it in the page.** At the top of the explorer is a "Your API token"
+   box. Paste the token, press "Save token", then "Test token". If the token
+   works the page says "Signed in as" and your username. If Whatnot answers 401,
+   the token is wrong or has expired.
+3. **Remember it or not.** "Remember on this computer" is off to start with, so
+   the token is forgotten when you close the tab. Tick it to keep the token in
+   this browser between visits. "Clear" removes it either way.
 
-(In PowerShell: `$env:WHATNOT_API_KEY="your-token-here"`.)
+What the tool does with your token: it stays in your browser. The page only ever
+sends it to the small server running on your own computer (at localhost), and
+that server only forwards it to api.whatnot.com. It is never written to disk,
+never logged and never shown back on the page apart from its last four
+characters. The local server refuses requests from any other website, so a page
+you happen to have open elsewhere cannot use it.
 
-- Functions that change your data need `ALLOW_WRITES=true` as well.
-- The destructive ones also ask you to tick a confirm box on every run.
+Safety boxes:
+
+- Read functions just run.
+- Functions that change your data show a box, "I understand this changes data
+  on my Whatnot account". You tick it for each function before it will run.
+- Destructive functions (cancel, ship, buy a label, delete) show that box plus
+  a red confirm box, and both must be ticked.
 - Disconnecting the application is always refused. It would cut the link to
   your connector.
+
+Prefer environment variables? Starting with `WHATNOT_API_KEY=your-token` (and
+`ALLOW_WRITES=true` to skip the server's write check) still works. A token
+pasted in the page wins over the environment one.
 
 ## Safety classes
 
