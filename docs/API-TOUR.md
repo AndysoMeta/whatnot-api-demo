@@ -230,7 +230,10 @@ calls a second.
    updated, then its variants were listed, read and updated. Its inventory was
    set and adjusted, and it was merchandised into the private test show. The
    first attempt to add it to the show was refused because the product had no
-   image, so one image was added and the second attempt went through. Then a
+   image, so one image was added and the second attempt went through. A later
+   live run from the page found the other rule: every variant must have a price
+   before the product can be merchandised. So a product needs both an image
+   and a price before it can go into a show. Then a
    livestream report was generated and checked. Note that the variant,
    set-inventory and adjust-inventory calls answer 207 Multi-Status even when
    every item succeeds; the per-item results inside the body tell the story.

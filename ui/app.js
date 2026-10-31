@@ -13,6 +13,7 @@ const state = {
   run: null,
   fixtures: {},
   tokens: {},
+  liveTokens: {},
   status: { token: false, allowWrites: false },
   pageToken: "",
   tokenStored: false,
@@ -90,6 +91,99 @@ async function loadFixtures() {
     state.fixtures = {};
     state.tokens = {};
   }
+}
+
+// Ids learned from live runs in this tab (a product you just created, its
+// variant, a report) win over the recorded ones, so the other pages prefill
+// with something that still exists. Kept in sessionStorage, so a closed tab
+// forgets them.
+const LIVE_IDS_KEY = "whatnot-demo-live-ids";
+
+function loadLiveTokens() {
+  try {
+    const raw = window.sessionStorage.getItem(LIVE_IDS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    state.liveTokens = parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    state.liveTokens = {};
+  }
+}
+
+function saveLiveTokens() {
+  try {
+    window.sessionStorage.setItem(LIVE_IDS_KEY, JSON.stringify(state.liveTokens));
+  } catch {
+    // Storage may be blocked; the ids then last only until the page reloads.
+  }
+}
+
+function effectiveTokens() {
+  return { ...state.tokens, ...state.liveTokens };
+}
+
+function firstRowId(body) {
+  const row = body?.data?.[0];
+  return row && row.id != null ? String(row.id) : undefined;
+}
+
+// Returns a plain sentence about what was remembered, or "" when nothing was.
+function rememberLiveIds(name, args, body) {
+  const learned = {};
+  const set = (k, v) => {
+    if (v != null && v !== "") learned[k] = String(v);
+  };
+  switch (name) {
+    case "create_a_product":
+    case "get_a_product":
+    case "update_a_product":
+      set("PRODUCT_ID", body?.id);
+      break;
+    case "list_product_variants":
+      set("PRODUCT_ID", args?.product_id);
+      set("VARIANT_ID", firstRowId(body));
+      break;
+    case "get_a_product_variant":
+      set("PRODUCT_ID", args?.product_id);
+      set("VARIANT_ID", body?.id);
+      break;
+    case "update_product_variants":
+      set("PRODUCT_ID", args?.product_id);
+      set("VARIANT_ID", body?.variants?.[0]?.id);
+      break;
+    case "generate_a_report":
+      set("REPORT_ID", body?.id);
+      break;
+    case "list_orders":
+      set("ORDER_ID", firstRowId(body));
+      break;
+    case "list_order_items":
+      set("ORDER_ID", args?.order_id);
+      set("ORDER_ITEM_ID", firstRowId(body));
+      break;
+    case "list_shipments":
+      set("SHIPMENT_ID", firstRowId(body));
+      break;
+    case "list_shipment_items":
+      set("SHIPMENT_ID", args?.shipment_id);
+      set("SHIPMENT_ITEM_ID", firstRowId(body));
+      break;
+    case "delete_a_product":
+      if (args?.product_id && state.liveTokens.PRODUCT_ID === String(args.product_id)) {
+        delete state.liveTokens.PRODUCT_ID;
+        delete state.liveTokens.VARIANT_ID;
+        saveLiveTokens();
+        return "That product is gone, so the other pages go back to the recorded ids.";
+      }
+      return "";
+    default:
+      return "";
+  }
+  const changed = Object.entries(learned).filter(([k, v]) => state.liveTokens[k] !== v);
+  if (!changed.length) return "";
+  Object.assign(state.liveTokens, learned);
+  saveLiveTokens();
+  const words = changed.map(([k, v]) => k.toLowerCase().replaceAll("_", " ") + " " + v);
+  return "Remembered " + words.join(" and ") + " for the other pages in this tab.";
 }
 
 function tourOrder() {
@@ -407,7 +501,7 @@ function recordedBlock(f, { showArgs = true } = {}) {
 // ---------- explorer detail ----------
 
 function runBlock(f) {
-  const demoArgs = resolveTokens(f.demo, state.tokens);
+  const demoArgs = resolveTokens(f.demo, effectiveTokens());
   const textarea = el("textarea", { id: "args", spellcheck: "false", "aria-describedby": "args-hint" });
   textarea.value = pretty(demoArgs);
   const hint = el("p", { id: "args-hint", class: "hint" });
@@ -417,7 +511,7 @@ function runBlock(f) {
     const left = leftTokens(textarea.value);
     hint.textContent = left.length
       ? `Some ids are not recorded yet, so they still read ${left.map((t) => `{{${t}}}`).join(", ")}. Put a real id there before running live.`
-      : "Edit the JSON to change what is sent. Ids come from the recorded run.";
+      : "Edit the JSON to change what is sent. Ids come from the recorded run, or from your live runs in this tab.";
   }
   textarea.addEventListener("input", updateHint);
   updateHint();
@@ -452,7 +546,7 @@ function runBlock(f) {
     type: "button",
     text: "Reset to demo",
     onclick: () => {
-      textarea.value = pretty(resolveTokens(f.demo, state.tokens));
+      textarea.value = pretty(resolveTokens(f.demo, effectiveTokens()));
       updateHint();
       result.replaceChildren();
     },
@@ -494,9 +588,11 @@ function runBlock(f) {
         result.replaceChildren(el("p", { class: "msg warn", text: data.message || `The server said no (${res.status}).` }));
       } else {
         const ok = data.status >= 200 && data.status < 300;
+        const remembered = ok ? rememberLiveIds(f.name, args, data.body) : "";
         result.replaceChildren(
           el("p", { class: "hint" }, "Live response. Status ", statusCode(data.status), "."),
           ok ? "" : el("p", { class: "msg warn", text: plainStatus(data.status) }),
+          remembered ? el("p", { class: "msg ok", text: remembered }) : "",
           el("pre", { text: pretty(data.body ?? null), "aria-label": "Live response body" }),
         );
       }
@@ -525,7 +621,7 @@ function renderTour(index) {
   const f = state.byName.get(order[i - 1]);
   const tour = document.getElementById("tour");
   const fx = state.fixtures[f.name];
-  const args = fx?.args ?? resolveTokens(f.demo, state.tokens);
+  const args = fx?.args ?? resolveTokens(f.demo, effectiveTokens());
 
   const prev = el("button", {
     type: "button",
@@ -580,6 +676,7 @@ let lastFn = null;
 let lastStep = 1;
 
 async function route() {
+  loadLiveTokens();
   await loadFixtures();
   renderStatus();
   const hash = location.hash || "";
