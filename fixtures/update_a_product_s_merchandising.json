@@ -1,0 +1,27 @@
+{
+  "function": "update_a_product_s_merchandising",
+  "tag": "Merchandising",
+  "safety": "write",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:36:14.000Z",
+  "args": {
+    "product_id": "652907899",
+    "body": {
+      "transaction_type": "buy_it_now",
+      "reserve_for_live": true,
+      "shows": {
+        "strategy": "ADD",
+        "show_ids": [
+          "086df56b-c77d-436d-bff5-5ac154016aac"
+        ]
+      }
+    }
+  },
+  "status": 200,
+  "body": {
+    "product_id": "652907899",
+    "transaction_type": "buy_it_now",
+    "reserved_for_live": true
+  },
+  "note": "Added the demo product to the private test show as a buy it now item reserved for live. The first try was rejected with 422 because the product had no image, so one image was added with update_a_product and this second try succeeded."
+}

@@ -1,0 +1,32 @@
+{
+  "function": "adjust_inventory",
+  "tag": "Inventory",
+  "safety": "write",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:35:26.000Z",
+  "args": {
+    "body": {
+      "items": [
+        {
+          "variant_id": "4b774eda-39fe-4195-95d2-2e6c0e01b060",
+          "delta": -1,
+          "idempotency_key": "api-demo-adj-1"
+        }
+      ]
+    }
+  },
+  "status": 207,
+  "body": {
+    "results": [
+      {
+        "variant_id": "4b774eda-39fe-4195-95d2-2e6c0e01b060",
+        "idempotency_key": "api-demo-adj-1",
+        "status": "applied",
+        "previous_quantity": 2,
+        "new_quantity": 1,
+        "warnings": []
+      }
+    ]
+  },
+  "note": "Took one unit off the demo variant's stock. The result shows it was applied, going from 2 to 1, so a relative change works on top of the earlier set."
+}

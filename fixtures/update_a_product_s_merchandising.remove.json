@@ -1,0 +1,25 @@
+{
+  "function": "update_a_product_s_merchandising",
+  "tag": "Merchandising",
+  "safety": "write",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:37:38.000Z",
+  "args": {
+    "product_id": "652907899",
+    "body": {
+      "shows": {
+        "strategy": "REMOVE",
+        "show_ids": [
+          "086df56b-c77d-436d-bff5-5ac154016aac"
+        ]
+      }
+    }
+  },
+  "status": 200,
+  "body": {
+    "product_id": "652907899",
+    "transaction_type": "buy_it_now",
+    "reserved_for_live": true
+  },
+  "note": "Cleanup step: took the demo product back out of the test show. The response has the same shape as the add call and does not list shows, so it does not by itself prove the removal."
+}

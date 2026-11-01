@@ -1,0 +1,38 @@
+{
+  "function": "list_shipment_items",
+  "tag": "Shipments",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:33:39.000Z",
+  "args": {
+    "shipment_id": "519027322"
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "1284784057",
+        "shipment_id": "519027322",
+        "order_id": "1475955351",
+        "order_item_id": "1475951120",
+        "dimension_profile": {
+          "id": "905463",
+          "name": "12 oz",
+          "weight": {
+            "value": 12,
+            "unit": "ounce"
+          },
+          "dimensions": null,
+          "ownership": "seller",
+          "active": true
+        },
+        "hazardous_material": "not_hazardous",
+        "country_of_origin": null,
+        "created_at": "2026-10-26T02:18:22.346Z",
+        "updated_at": "2026-10-26T02:18:22.346Z"
+      }
+    ],
+    "next_cursor": null
+  },
+  "note": "Listed the items packed in that shipment. It holds one item, linking the shipment to its order and order item, with the dimension profile used for postage."
+}

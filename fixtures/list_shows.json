@@ -1,0 +1,35 @@
+{
+  "function": "list_shows",
+  "tag": "Shows",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:31:12.000Z",
+  "args": {
+    "status": "live",
+    "limit": 5
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "086df56b-c77d-436d-bff5-5ac154016aac",
+        "title": "Boring Show",
+        "url": "https://www.whatnot.com/dashboard/lives/edit/086df56b-c77d-436d-bff5-5ac154016aac",
+        "description": null,
+        "status": "live",
+        "visibility": "private",
+        "scheduled_start_at": "2026-10-31T08:20:07.760Z",
+        "ended_at": null,
+        "thumbnail": {
+          "id": "1916476439",
+          "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpdmVzdHJlYW1fdGh1bWJuYWlscy85ZmQ3ZDdhNi0xNWU3LTRmNTEtODk1Zi05ZWQzN2M1ZjFlYjMuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IG51bGwsICJoZWlnaHQiOiBudWxsLCAiZml0IjogImNvbnRhaW4iLCAiYmFja2dyb3VuZCI6IHsiciI6IDI1NSwgImciOiAyNTUsICJiIjogMjU1LCAiYWxwaGEiOiAxfX19fQ==?signature=ec8c74227bd9cfef8b1ad53fb812c8e0301530904f3efe46b2aee2b2920ab27a",
+          "alt": "9fd7d7a6-15e7-4f51-895f-9ed37c5f1eb3.jpeg"
+        },
+        "created_at": "2026-10-13T19:22:22.637Z",
+        "updated_at": "2026-10-31T08:20:07.946Z"
+      }
+    ],
+    "next_cursor": null
+  },
+  "note": "Listed shows with status live. It returned one show, the private test show Boring Show, with its edit link, visibility, start time and thumbnail."
+}

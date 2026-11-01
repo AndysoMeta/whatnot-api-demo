@@ -1,0 +1,33 @@
+{
+  "function": "get_an_order_item",
+  "tag": "Orders",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:33:03.000Z",
+  "args": {
+    "order_id": "1485136575",
+    "item_id": "1485132344"
+  },
+  "status": 200,
+  "body": {
+    "id": "1485132344",
+    "order_id": "1485136575",
+    "product_id": "645510725",
+    "variant_id": null,
+    "product_external_id": null,
+    "variant_external_id": null,
+    "purchased_item": {
+      "title": "Kayou My Little Pony Trading Card Game, Discord, TCG, 20 Packs, 5 Cards/Pack, for Age 10+",
+      "description": "This listing is for 1 pack of cards. 5 cards per pack",
+      "sku": null
+    },
+    "quantity": 1,
+    "unit_price": {
+      "amount": "4",
+      "currency": "USD"
+    },
+    "price_includes_tax": false,
+    "shipment_id": null
+  },
+  "note": "Fetched that single order item by order id and item id. It returns the same record as the item list: what was bought, quantity, unit price and shipment link."
+}

@@ -1,0 +1,18 @@
+{
+  "function": "request_a_shipping_label",
+  "tag": "Shipments",
+  "safety": "destructive",
+  "mode": "error_demo",
+  "recorded_at": "2026-10-31T08:37:28.000Z",
+  "args": {
+    "shipment_id": "1"
+  },
+  "status": 404,
+  "body": {
+    "type": "shipment-not-found",
+    "title": "Shipment not found",
+    "status": 404,
+    "detail": "Shipment 1 was not found."
+  },
+  "note": "Asked for a shipping label on shipment 1, which does not exist, so no label was bought and nothing was charged. Whatnot answered 404 shipment-not-found."
+}

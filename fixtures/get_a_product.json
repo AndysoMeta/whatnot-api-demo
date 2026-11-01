@@ -1,0 +1,39 @@
+{
+  "function": "get_a_product",
+  "tag": "Products",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:34:25.000Z",
+  "args": {
+    "product_id": "652907899"
+  },
+  "status": 200,
+  "body": {
+    "id": "652907899",
+    "title": "API DEMO TEST ITEM (safe to delete)",
+    "description": "Created by the API demo recorder on 2026-10-31. Delete me.",
+    "external_id": "api-demo-2026-10-31",
+    "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjUyMjEzNTc1NA==",
+    "category": {
+      "id": "265",
+      "name": "Deal Hunting"
+    },
+    "attributes": [],
+    "options": [],
+    "media": [],
+    "dimension_profile": {
+      "id": "123059",
+      "name": "0-1 oz",
+      "weight": {
+        "value": 1,
+        "unit": "ounce"
+      },
+      "dimensions": null,
+      "ownership": "whatnot",
+      "active": true
+    },
+    "created_at": "2026-10-31T08:34:15.310Z",
+    "updated_at": "2026-10-31T08:34:15.310Z"
+  },
+  "note": "Fetched the demo product right after it was created. It returns exactly what create_a_product returned, including the inventory dashboard link."
+}

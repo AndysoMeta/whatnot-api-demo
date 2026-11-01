@@ -1,0 +1,38 @@
+{
+  "function": "get_show_analytics",
+  "tag": "Analytics",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:34:04.000Z",
+  "args": {
+    "show_id": "086df56b-c77d-436d-bff5-5ac154016aac"
+  },
+  "status": 200,
+  "body": {
+    "show_id": "086df56b-c77d-436d-bff5-5ac154016aac",
+    "title": "Boring Show",
+    "start_time": "2026-10-31T08:20:07.760Z",
+    "calculation_status": "WILL_NOT_BE_CALCULATED",
+    "sales": null,
+    "estimated_earnings": null,
+    "orders_count": null,
+    "average_order_value": null,
+    "giveaway_orders_count": null,
+    "giveaway_spend": null,
+    "show_impression_count": null,
+    "show_clickthrough_rate": null,
+    "buyers_count": null,
+    "first_time_buyers_count": null,
+    "returning_buyers_count": null,
+    "giveaway_winners_count": null,
+    "first_time_giveaway_winners_count": null,
+    "returning_giveaway_winners_count": null,
+    "buyer_shares_count": null,
+    "stream_minutes": null,
+    "max_concurrent_viewers": null,
+    "total_views": null,
+    "distinct_viewers_count": null,
+    "average_rating": null
+  },
+  "note": "Asked for analytics on the private test show. Whatnot answered with calculation_status WILL_NOT_BE_CALCULATED and every metric null, which shows the full list of metrics a normal show gets."
+}

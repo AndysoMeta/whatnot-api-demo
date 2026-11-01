@@ -1,0 +1,23 @@
+{
+  "function": "get_the_current_user",
+  "tag": "Users",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:30:57.000Z",
+  "args": {},
+  "status": 200,
+  "body": {
+    "id": "redacted",
+    "username": "redacted",
+    "display_name": "redacted",
+    "image": {
+      "id": "redacted",
+      "url": "redacted",
+      "alt": null
+    },
+    "seller_currency": "USD",
+    "country_code": "US",
+    "can_go_live": true
+  },
+  "note": "Returned the seller account that owns the connector (id, names and avatar link redacted here). It shows the user id, username, display name, avatar, selling currency, country and whether the account can go live."
+}

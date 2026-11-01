@@ -1,0 +1,37 @@
+{
+  "function": "list_product_variants",
+  "tag": "Products",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:34:45.000Z",
+  "args": {
+    "product_id": "652907899"
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "4b774eda-39fe-4195-95d2-2e6c0e01b060",
+        "product_id": "652907899",
+        "sku": null,
+        "external_id": null,
+        "selected_options": [],
+        "pricing": {
+          "buy_it_now": {
+            "price": null
+          },
+          "auction": {
+            "start_price": null
+          }
+        },
+        "country_of_origin": null,
+        "inventory": {
+          "available_quantity": 0
+        },
+        "media": []
+      }
+    ],
+    "next_cursor": null
+  },
+  "note": "Listed the variants of the demo product. A product with no options gets one default variant automatically, with no SKU, no prices and zero available quantity."
+}

@@ -1,0 +1,201 @@
+{
+  "function": "list_products",
+  "tag": "Products",
+  "safety": "read",
+  "mode": "live",
+  "recorded_at": "2026-10-31T08:31:36.000Z",
+  "args": {
+    "limit": 5
+  },
+  "status": 200,
+  "body": {
+    "data": [
+      {
+        "id": "647559331",
+        "title": "5",
+        "description": "5",
+        "external_id": null,
+        "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjQ5NDI1ODI3Mw==",
+        "category": {
+          "id": "8",
+          "name": "Yu-Gi-Oh! Cards"
+        },
+        "attributes": [],
+        "options": [],
+        "media": [],
+        "dimension_profile": {
+          "id": "905466",
+          "name": "Giveaway Envelope PWE",
+          "weight": {
+            "value": 1,
+            "unit": "ounce"
+          },
+          "dimensions": null,
+          "ownership": "seller",
+          "active": true
+        },
+        "created_at": "2026-10-27T02:25:43.495Z",
+        "updated_at": "2026-10-27T02:25:43.495Z"
+      },
+      {
+        "id": "646712667",
+        "title": "10",
+        "description": "10",
+        "external_id": null,
+        "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjQ5MDYzMDkzOA==",
+        "category": {
+          "id": "265",
+          "name": "Deal Hunting"
+        },
+        "attributes": [],
+        "options": [],
+        "media": [],
+        "dimension_profile": {
+          "id": "905466",
+          "name": "Giveaway Envelope PWE",
+          "weight": {
+            "value": 1,
+            "unit": "ounce"
+          },
+          "dimensions": null,
+          "ownership": "seller",
+          "active": true
+        },
+        "created_at": "2026-10-26T02:32:46.682Z",
+        "updated_at": "2026-10-26T02:32:46.682Z"
+      },
+      {
+        "id": "645983088",
+        "title": "5",
+        "description": "5",
+        "external_id": null,
+        "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjQ4NzIyOTQ1MA==",
+        "category": {
+          "id": "265",
+          "name": "Deal Hunting"
+        },
+        "attributes": [],
+        "options": [],
+        "media": [],
+        "dimension_profile": {
+          "id": "123059",
+          "name": "0-1 oz",
+          "weight": {
+            "value": 1,
+            "unit": "ounce"
+          },
+          "dimensions": null,
+          "ownership": "whatnot",
+          "active": true
+        },
+        "created_at": "2026-10-25T06:38:02.340Z",
+        "updated_at": "2026-10-25T06:38:02.340Z"
+      },
+      {
+        "id": "645514917",
+        "title": "Ravensburger Lorcana Tcg: Attack of the Vine! Collection Starter Set - Rapunzel",
+        "description": "Let down your hair and swing into your gameplay and collecting journey with this stunning set. What more could you dream of-other than seeing the floating lanterns, of course. 4 Attack of the Vine! booster packs (each with 12 randomized cards for 48 cards total), 1 Rapunzel- High Climber card portfolio, 1 \"Glimmer foil\" Rapunzel - Ethereal Protector promo card, 1 Collector's guide Other Trading Cards Toys.",
+        "external_id": null,
+        "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjQ4NDczMzIwMg==",
+        "category": {
+          "id": "2013",
+          "name": "Lorcana"
+        },
+        "attributes": [
+          {
+            "id": "84",
+            "name": "Condition",
+            "value": "New"
+          }
+        ],
+        "options": [],
+        "media": [
+          {
+            "id": "1984701823",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MzMyMDItMS05MWZiMzM5My03MzU0LTRjMDQtOTljZC05Njc2ZGVhOTEyNTYiLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=2c706499d9d3bf9418717c7ac7091c0a23424136a27c3a4be4627e52467e1019",
+            "alt": "Front"
+          }
+        ],
+        "dimension_profile": {
+          "id": "905465",
+          "name": "1 lb",
+          "weight": {
+            "value": 1,
+            "unit": "pound"
+          },
+          "dimensions": null,
+          "ownership": "seller",
+          "active": true
+        },
+        "created_at": "2026-10-24T19:04:40.726Z",
+        "updated_at": "2026-10-24T19:04:40.726Z"
+      },
+      {
+        "id": "645510725",
+        "title": "Kayou My Little Pony Trading Card Game, Discord, TCG, 20 Packs, 5 Cards/Pack, for Age 10+",
+        "description": "This listing is for 1 pack of cards. 5 cards per pack",
+        "external_id": null,
+        "url": "https://www.whatnot.com/dashboard/inventory/TGlzdGluZ05vZGU6MjQ4NDcxNTgwOQ==",
+        "category": {
+          "id": "2050",
+          "name": "Other Entertainment Cards"
+        },
+        "attributes": [
+          {
+            "id": "84",
+            "name": "Condition",
+            "value": "New"
+          }
+        ],
+        "options": [],
+        "media": [
+          {
+            "id": "1984677444",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MTU4MDktMS02NWJiYjFmNS05MzM1LTQyN2YtODkzNy0wNDM0MzIzYjRhNDciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=bb411016fb50a1248df17ee6ad0163009ac92a9597d10618608a6f085502d7d7",
+            "alt": "Front"
+          },
+          {
+            "id": "1984677443",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MTU4MDktMi02ZDZmZTZjMS03ZTQ3LTRhYWYtYmNiNC1hMTAxMmQxMGNiNDgiLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=554bc3a0ffa97843ab19fa310e116d7e02b6a4884ce601a035dd79941a52e5a0",
+            "alt": "Front"
+          },
+          {
+            "id": "1984677442",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MTU4MDktMy1kMGQyNmJlOC01ZGQ1LTRhZDktYjZmNi04YzBiZjQwODhjNzgiLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=87358dc25c75fa567c9d5e660b28ada3b3956fa5b7b68c7623c9ac11edf9f2b0",
+            "alt": "Front"
+          },
+          {
+            "id": "1984677447",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MTU4MDktNC00Y2Y0MDVkZS1iMDczLTRiY2ItOWQxMC00MzU3YmE1MmJjOGQiLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=15c76f103369c062cd9b675629868b57dce863d0dd9b28054ec29f63f1a162ad",
+            "alt": "Front"
+          },
+          {
+            "id": "1984677438",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MTU4MDktNS00M2Q4ZTAzYS1lMjZkLTRjYWMtOGNkYS1mNWI2OGI4YTUyY2MiLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=e3e9cff90e0dda809c672c040814f13c54f294b27275b66527027579890d7d7e",
+            "alt": "Front"
+          },
+          {
+            "id": "1984677445",
+            "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogImxpc3RpbmdzLzI0ODQ3MTU4MDktNi1jODc5NTliMy03M2U5LTQ0YjYtYjdkZC1mMGFiNzMzOTE4ZDIiLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=a190bc723cf1547c79bce7fa70db6900af27d0520336ce4240e9962034937158",
+            "alt": "Front"
+          }
+        ],
+        "dimension_profile": {
+          "id": "905466",
+          "name": "Giveaway Envelope PWE",
+          "weight": {
+            "value": 1,
+            "unit": "ounce"
+          },
+          "dimensions": null,
+          "ownership": "seller",
+          "active": true
+        },
+        "created_at": "2026-10-24T18:59:59.133Z",
+        "updated_at": "2026-10-24T19:58:23.954Z"
+      }
+    ],
+    "next_cursor": "gAAAAABq5ado7TXZikTQVFWollZz_pn8UBD5HQdnwEeVBly_C8lqhCvpk3eJ_1TgmmSXWcztGEokVUtLXIf9wmWXg_lHGJltphAKx-tiP45O9vnBWg1sgUFHMSQN_AitmRjTz-OmV3lGe1wG7e60kyXWfpU_xECdq_BjkUBmIA7DiQYp39wVkWxihEtxqLoqxtDp_e4oiOz2"
+  },
+  "note": "Listed the first five products in the seller's inventory, newest first. Each product carries its category, attributes, media and dimension profile, and next_cursor points to the next page."
+}
