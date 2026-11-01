@@ -90,11 +90,11 @@ test("a blank token counts as no token", async () => {
 
 test("token is sent as a Bearer header with JSON content type", async () => {
   reset({ WHATNOT_API_KEY: TOKEN });
-  replies.push({ status: 200, body: { id: "1506502", username: "andysometa" } });
+  replies.push({ status: 200, body: { id: "100000", username: "demo_seller" } });
   const r = await run({ name: "get_the_current_user", args: {} });
   assert.equal(r.code, 200);
   assert.equal(r.data.status, 200);
-  assert.deepEqual(r.data.body, { id: "1506502", username: "andysometa" });
+  assert.deepEqual(r.data.body, { id: "100000", username: "demo_seller" });
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, "https://api.whatnot.com/seller-api/rest/v2/users/me");
   assert.equal(calls[0].init.method, "GET");

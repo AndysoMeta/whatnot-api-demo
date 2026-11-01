@@ -1,8 +1,8 @@
 # Whatnot API Demo: shared contract
 
-Project: `C:\Users\FirmB\Documents\MetaFour\whatnot-api-demo`
+Project: the `whatnot-api-demo` folder (this repository).
 Product name in UI text: "Whatnot API Demo". Byline: "Mood Swings Design".
-Owner: Andy (Whatnot seller `andysometa`, user id 1506502, USD, US).
+Owner: the seller who recorded the run (one Whatnot seller account, USD, US; identity redacted in the fixtures).
 
 ## What this is
 
@@ -10,11 +10,11 @@ A small local tool that shows every function of Whatnot's Seller API
 working for real. The Seller API is REST at
 `https://api.whatnot.com/seller-api/rest/v2` (Bearer token). Whatnot also
 hosts an MCP server at `https://mcp.whatnot.com` that exposes the same
-34 functions to Claude. Andy has the MCP connected in Claude; he has no
+34 functions to Claude. The seller has the MCP connected in Claude and no
 REST token on disk. So:
 
 - The **recorded run** (fixtures/) is made through the MCP connector by a
-  Claude agent, once, against Andy's private test show.
+  Claude agent, once, against the seller's private test show.
 - The **explorer app** shows each function, its request, the recorded live
   response, and can run it live against REST with a token the user pastes
   into the page (or `WHATNOT_API_KEY` in the environment).
@@ -37,7 +37,7 @@ Tag Orders: list_orders, get_an_order, list_order_items, get_an_order_item,
 Tag Shipments: list_shipments, get_a_shipment, list_shipment_items,
   get_a_shipment_item, request_a_shipping_label
 
-MCP connector tool prefix in Claude: `mcp__49be34e3-a436-4499-8096-f03eda44191f__`
+MCP connector tool prefix in Claude: `mcp__<connector id>__` (the id is per installation).
 Every MCP result is `{status, headers, body}` (raw HTTP). Rate limit header
 seen: `ratelimit-limit: 2, 2;w=1` so pace at most 1 call per second.
 Lists paginate with `limit` (1..50), `cursor`, `reverse`; responses carry
@@ -46,7 +46,7 @@ Lists paginate with `limit` (1..50), `cursor`, `reverse`; responses carry
 ## Safety classes
 
 - `read`: GET only. Always safe to run.
-- `write`: creates or changes Andy's own inventory data. Run only on the
+- `write`: creates or changes the seller's own inventory data. Run only on the
   demo product this tool created (title starts with `API DEMO TEST ITEM`).
 - `destructive`: cancel_an_order, add_a_tracking_code_to_order_items,
   request_a_shipping_label (costs money), delete_a_product,
@@ -55,7 +55,7 @@ Lists paginate with `limit` (1..50), `cursor`, `reverse`; responses carry
   impossible id (`"1"`) so the real error response is captured
   (`mode: "error_demo"`). delete_a_product runs once, on the demo product.
   disconnect_the_current_application is never run (`mode: "not_run"`): it
-  would break Andy's connector.
+  would break the seller's connector.
 
 ## Known ids (live, 2026-10-31)
 
@@ -109,10 +109,12 @@ Plus `fixtures/_run.json`:
 
 In orders, order items, shipments and shipment items: replace
 `buyer.username`, `buyer.display_name`, `recipient.username`,
-`recipient.display_name` with `"redacted"`, and set any
-`destination_address` or address-like object to `null`. Keep ids, amounts,
-statuses, timestamps and tracking codes. Products and shows are Andy's own
-and need no redaction.
+`recipient.display_name`, `buyer.id`, `recipient.id` and every
+`tracking_code` with `"redacted"`, and set any `destination_address` or
+address-like object to `null`. Keep order and shipment ids, amounts,
+statuses and timestamps. Products and shows are the seller's own and need
+no redaction. The seller's own identity in get_the_current_user is
+redacted too (id, names, avatar link).
 
 ## Explorer app contract
 

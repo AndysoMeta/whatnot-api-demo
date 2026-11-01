@@ -14,7 +14,7 @@
     "status": "in_transit",
     "fulfillment_method": "shipping",
     "recipient": {
-      "id": "70917583",
+      "id": "redacted",
       "username": "redacted",
       "display_name": "redacted"
     },
@@ -34,7 +34,7 @@
     "tracking": {
       "carrier": "usps",
       "service": "usps_first_class_package_international_service",
-      "tracking_code": "LS025817872US",
+      "tracking_code": "redacted",
       "last_mile_tracking_code": null
     },
     "documents": null,

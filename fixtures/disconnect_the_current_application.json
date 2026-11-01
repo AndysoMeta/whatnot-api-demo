@@ -7,5 +7,5 @@
   "args": {},
   "status": null,
   "body": null,
-  "note": "Not run on purpose. This call revokes the app's access to the seller account, so running it would disconnect Andy's Whatnot connector until he signs in again."
+  "note": "Not run on purpose. This call revokes the app's access to the seller account, so running it would disconnect the seller's Whatnot connector until they sign in again."
 }

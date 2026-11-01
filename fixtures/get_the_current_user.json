@@ -7,17 +7,17 @@
   "args": {},
   "status": 200,
   "body": {
-    "id": "1506502",
-    "username": "andysometa",
-    "display_name": "AndySoMeta",
+    "id": "redacted",
+    "username": "redacted",
+    "display_name": "redacted",
     "image": {
-      "id": "7352611",
-      "url": "https://images.whatnot.com/eyJidWNrZXQiOiAid2hhdG5vdC1pbWFnZXMiLCAia2V5IjogInVzZXJzLzE1MDY1MDIvNWY3NzFkODMtZmY5ZS00OWFkLWE0NjItNzQ0MmRjMzRkYTNlLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiBudWxsLCAiaGVpZ2h0IjogbnVsbCwgImZpdCI6ICJjb250YWluIiwgImJhY2tncm91bmQiOiB7InIiOiAyNTUsICJnIjogMjU1LCAiYiI6IDI1NSwgImFscGhhIjogMX19fX0=?signature=60f4375ddceddeecb77ca2af7466ceeb39d1aef05c815eb14f5d5a538d143088",
+      "id": "redacted",
+      "url": "redacted",
       "alt": null
     },
     "seller_currency": "USD",
     "country_code": "US",
     "can_go_live": true
   },
-  "note": "Returned the seller account that owns the connector. It shows the user id, username, display name, avatar, selling currency, country and whether the account can go live."
+  "note": "Returned the seller account that owns the connector (id, names and avatar link redacted here). It shows the user id, username, display name, avatar, selling currency, country and whether the account can go live."
 }

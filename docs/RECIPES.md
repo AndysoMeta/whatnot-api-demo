@@ -43,14 +43,14 @@ curl -s "$BASE/users/me" \
   -H "Authorization: Bearer $WHATNOT_API_KEY"
 ```
 
-Real answer (`fixtures/get_the_current_user.json`, the image link trimmed):
+Real answer (`fixtures/get_the_current_user.json`, ids, names and the image link redacted):
 
 ```json
 {
-  "id": "1506502",
-  "username": "andysometa",
-  "display_name": "AndySoMeta",
-  "image": { "id": "7352611", "url": "https://images.whatnot.com/...", "alt": null },
+  "id": "redacted",
+  "username": "redacted",
+  "display_name": "redacted",
+  "image": { "id": "redacted", "url": "redacted", "alt": null },
   "seller_currency": "USD",
   "country_code": "US",
   "can_go_live": true
@@ -303,7 +303,7 @@ Real answer (`fixtures/list_orders.json`, one order, trimmed; the buyer is blank
       "status": "failed",
       "show_id": "b2bf815b-ea29-4247-a64b-15ddc7bfebc1",
       "transaction_type": "buy_it_now",
-      "buyer": { "id": "75158168", "username": "redacted", "display_name": "redacted" },
+      "buyer": { "id": "redacted", "username": "redacted", "display_name": "redacted" },
       "amounts": {
         "subtotal": { "amount": "4", "currency": "USD" },
         "shipping": { "amount": "0", "currency": "USD" },
@@ -372,13 +372,13 @@ Real answer (`fixtures/list_shipments.json`, one shipment, trimmed). Here the ad
   "id": "519027322",
   "status": "in_transit",
   "fulfillment_method": "shipping",
-  "recipient": { "id": "70917583", "username": "redacted", "display_name": "redacted" },
+  "recipient": { "id": "redacted", "username": "redacted", "display_name": "redacted" },
   "destination_address": null,
   "weight": { "value": 12, "unit": "ounce" },
   "tracking": {
     "carrier": "usps",
     "service": "usps_first_class_package_international_service",
-    "tracking_code": "LS025817872US"
+    "tracking_code": "redacted"
   },
   "seller_paid_shipping_cost": { "amount": "0", "currency": "USD" }
 }
