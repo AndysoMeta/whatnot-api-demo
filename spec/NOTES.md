@@ -139,12 +139,34 @@ succeeded; the body lists per-item results (`InventoryBatchResult.results`,
 
 Creating a product does not put it on sale. Variants are created with no
 price, image or inventory. Order: 1) POST /products, 2) GET variants for ids,
-3) PATCH variants with `pricing.buy_it_now.price` or
-`pricing.auction.start_price` and `media` (at most one image), POST
+3) PATCH variants with `price` (see "Variant pricing change" below) and
+`media` (at most one image), POST
 /inventory/set, 4) POST /merchandising/products/{id} with `transaction_type`
 buy_it_now or auction and `shows`. Buy-it-now sells on the profile shop unless
 `reserve_for_live` is true; auctions are always reserved for live. Every
 variant must be priced for that format and at least one must have inventory.
+
+## Variant pricing change (2026-11-05)
+
+From Whatnot's email of 2026-11-05 and the reference pages read 2026-11-06
+(ProductVariant, ProductVariantPatch, Money, VariantError, the PATCH
+variants page). `openapi.json` beside this file is the 2026-10-31 copy and
+still shows the old fields.
+
+- Variants have one `price` (Money: `amount` string in major units, e.g.
+  "42.00", and `currency` ISO 4217). It applies under the product's
+  `transaction_type`. Send it in PATCH /products/{id}/variants and read it
+  from ProductVariant.
+- `pricing.buy_it_now` and `pricing.auction` are deprecated and gone from the
+  reference. During migration `pricing` is still accepted: only the input
+  matching the product's `transaction_type` is applied; if both are sent and
+  differ, the other is ignored; if only a non-matching one is sent, the patch
+  fails with `pricing_transaction_type_mismatch`. No end date given.
+- VariantError codes now: `variant_not_found`, `variant_not_editable`,
+  `variants_not_supported`, `pricing_transaction_type_mismatch`
+  (`pricing_not_supported` is no longer listed).
+- The saved fixtures were recorded 2026-10-31 and keep the old `pricing`
+  shape as recorded.
 
 ## Webhooks (dashboard-configured, per app)
 
