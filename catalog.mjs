@@ -374,12 +374,12 @@ export const FUNCTIONS = [
           sku: "string up to 255 characters, or null",
           external_id: "string up to 255 characters, or null",
           country_of_origin: "string or null",
-          pricing: { buy_it_now: { price: MONEY }, auction: { start_price: MONEY } },
+          price: MONEY,
           media: [{ url: "string", alt: "string or null" }],
         },
       ],
       allow_partial_updates: "boolean, default false. false means one bad variant rejects the whole batch with a 422.",
-      _note: "variants holds 1 to 10 entries. media holds exactly 1 entry when given.",
+      _note: "variants holds 1 to 10 entries. media holds exactly 1 entry when given. price is the one price field (since 2026-11-05) and applies under the product's transaction_type, buy it now or auction.",
     },
     demo: {
       product_id: "{{PRODUCT_ID}}",
@@ -388,7 +388,7 @@ export const FUNCTIONS = [
           {
             id: "{{VARIANT_ID}}",
             sku: "API-DEMO-001",
-            pricing: { buy_it_now: { price: { amount: "5.00", currency: "USD" } } },
+            price: { amount: "5.00", currency: "USD" },
           },
         ],
       },

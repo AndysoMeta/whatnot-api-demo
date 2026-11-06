@@ -163,11 +163,13 @@ Real answer (`fixtures/list_product_variants.json`). Note the empty price and ze
 }
 ```
 
+This answer was recorded on 2026-10-31. On 2026-11-05 Whatnot moved variant pricing to a single `price` field, so its current docs show `price` (an amount and a currency, or null) where this shows the `pricing` block.
+
 Keep the variant `id` as `VARIANT_ID`.
 
 ### Step 3: give it a price and an image
 
-`update_product_variants` takes up to 10 variants. Prices are in whole currency units, written as text. For an auction, use `pricing.auction.start_price` instead of `pricing.buy_it_now.price`. The `media` list takes exactly one image, as a URL. Image processing happens in the background, so the new image may not show in the answer straight away.
+`update_product_variants` takes up to 10 variants. Each variant has one `price`, in whole currency units, written as text. It applies under the product's `transaction_type`, so the same field sets a buy it now price or an auction start price. The older `pricing.buy_it_now.price` and `pricing.auction.start_price` fields are deprecated. Whatnot still accepts them for now, but only the one that matches the product's `transaction_type` is applied, and sending only the one that does not match fails with `pricing_transaction_type_mismatch`. The `media` list takes exactly one image, as a URL. Image processing happens in the background, so the new image may not show in the answer straight away.
 
 ```bash
 curl -s -X PATCH "$BASE/products/PRODUCT_ID/variants" \
@@ -179,7 +181,7 @@ curl -s -X PATCH "$BASE/products/PRODUCT_ID/variants" \
       {
         "id": "VARIANT_ID",
         "sku": "APIDEMO-001",
-        "pricing": { "buy_it_now": { "price": { "amount": "1", "currency": "USD" } } },
+        "price": { "amount": "1", "currency": "USD" },
         "media": [ { "url": "https://example.com/photo.jpg" } ]
       }
     ]
@@ -203,6 +205,8 @@ Real answer, status **207** (`fixtures/update_product_variants.json`, which set 
   ]
 }
 ```
+
+This answer was recorded on 2026-10-31. On 2026-11-05 Whatnot moved variant pricing to a single `price` field, so its current docs show `price` (an amount and a currency, or null) where this shows the `pricing` block.
 
 ### Step 4: set the stock
 

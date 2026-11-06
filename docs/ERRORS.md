@@ -170,7 +170,9 @@ Variant updates return `variants` (the updated ones, in input order). From `fixt
 }
 ```
 
-That excerpt leaves out a few empty fields. When you send `allow_partial_updates: true`, the answer may also carry an `errors` list for the patches that were not applied. Each has the patch `id`, a `code` (`variant_not_found`, `variant_not_editable`, `pricing_not_supported` or `variants_not_supported`) and a `message`. With `allow_partial_updates` false (the default), one bad entry rejects the whole batch with a 422 and nothing is written.
+This answer was recorded on 2026-10-31. On 2026-11-05 Whatnot moved variant pricing to a single `price` field, so its current docs show `price` (an amount and a currency, or null) where this shows the `pricing` block.
+
+That excerpt leaves out a few empty fields. When you send `allow_partial_updates: true`, the answer may also carry an `errors` list for the patches that were not applied. Each has the patch `id`, a `code` (`variant_not_found`, `variant_not_editable`, `variants_not_supported` or `pricing_transaction_type_mismatch`) and a `message`. The last one means a variant was sent only the old `pricing` input that does not match the product's `transaction_type`. Send `price` instead. (Before 2026-11-05 the list had `pricing_not_supported` in place of `pricing_transaction_type_mismatch`.) With `allow_partial_updates` false (the default), one bad entry rejects the whole batch with a 422 and nothing is written.
 
 ## Retry rules
 
